@@ -1,0 +1,399 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>bibliometa.graph.conversion &mdash; Bibliometa  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Bibliometa
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">bibliometa</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Bibliometa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bibliometa.graph.conversion</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bibliometa.graph.conversion</h1><div class="highlight"><pre>
+<span></span><span class="c1"># !/usr/bin/python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;This module provides a class for converting a JSON file to an edge list.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">bibliometa.configuration</span> <span class="kn">import</span> <span class="n">BibliometaConfiguration</span>
+<span class="kn">from</span> <span class="nn">bibliometa.config</span> <span class="kn">import</span> <span class="n">LOGGING_FORMAT</span><span class="p">,</span> <span class="n">JSON_EDGELIST_CONVERSION_CONFIG_DEFAULT</span>
+<span class="kn">from</span> <span class="nn">bibliometa.graph.similarity</span> <span class="kn">import</span> <span class="n">Similarity</span>
+<span class="kn">from</span> <span class="nn">bibliometa.utils.archives</span> <span class="kn">import</span> <span class="n">tar</span>
+<span class="kn">from</span> <span class="nn">bibliometa.utils.utils</span> <span class="kn">import</span> <span class="n">MainUtils</span><span class="p">,</span> <span class="n">DictUtils</span>
+
+
+<div class="viewcode-block" id="JSON2EdgeList"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.conversion.JSON2EdgeList">[docs]</a><span class="k">class</span> <span class="nc">JSON2EdgeList</span><span class="p">(</span><span class="n">BibliometaConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The :class:`~bibliometa.graph.conversion.JSON2EdgeList` allows to configure and run the conversion from an</span>
+<span class="sd">    input JSON file to an edge list graph representation.</span>
+
+<span class="sd">    It extends the abstract :class:`~bibliometa.configuration.BibliometaConfiguration` class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a new :class:`~bibliometa.graph.conversion.JSON2EdgeList`.</span>
+
+<span class="sd">        :param kwargs: Arbitrary keyword arguments that are used as configuration keys and values.</span>
+<span class="sd">            For example, `verbose=True` will make available a configuration key `verbose` with the value</span>
+<span class="sd">            `True` (i.e., `self.config.verbose` will then return `True`). Configuration can be set during</span>
+<span class="sd">            initialization as well as after constructing a class instance by calling the `set_config` method</span>
+<span class="sd">            on a :class:`~bibliometa.graph.conversion.JSON2EdgeList` object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">JSON_EDGELIST_CONVERSION_CONFIG_DEFAULT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="JSON2EdgeList.start"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.conversion.JSON2EdgeList.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start the conversion.</span>
+
+<span class="sd">        :param n: Number that indicates how many elements will be shown in data preview when verbose == True</span>
+<span class="sd">        :type n: `int`</span>
+<span class="sd">        :raises FileNotFoundError: If file given in `self.config.i` can not be found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># set up logging</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">LOGGING_FORMAT</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_level_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_level_std</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start JSON2EdgeList conversion.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># read JSON file</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">DictUtils</span><span class="o">.</span><span class="n">read_from_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="c1"># Create graph corpus if necessary</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">create_corpus</span><span class="p">:</span>
+            <span class="n">corpus</span> <span class="o">=</span> <span class="n">GraphCorpus</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># load graph corpus from existing file</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">corpus</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">corpus</span> <span class="o">=</span> <span class="n">DictUtils</span><span class="o">.</span><span class="n">read_from_json</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. You may have to create a corpus first (set &#39;create_corpus&#39; in configuration to True).&quot;&quot;&quot;</span>
+                <span class="p">)</span>
+
+        <span class="c1"># show n entries from corpus if verbose == True</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">corpus</span><span class="o">.</span><span class="n">items</span><span class="p">())[:</span><span class="n">n</span><span class="p">]))</span>
+
+        <span class="c1"># Calculate similarity</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start similarity calculation.&quot;</span><span class="p">)</span>
+        <span class="n">Similarity</span><span class="o">.</span><span class="n">calculate</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Similarity calculation ended.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># put similarity files into tar.gz archive</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">archive</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">archive_ext</span> <span class="o">==</span> <span class="s2">&quot;.tar.gz&quot;</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Putting similarity files into &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">archive_ext</span><span class="si">}</span><span class="s2">&#39; archives.&quot;</span><span class="p">)</span>
+                <span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                <span class="n">tar</span><span class="p">(</span>
+                    <span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span>
+                    <span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">archive_ext</span>
+                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Similarity &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">archive_ext</span><span class="si">}</span><span class="s2">&#39; archive can now be found in &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">archive_ext</span><span class="si">}</span><span class="s2">.&quot;</span>
+                            <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Archive extensions other than &#39;tar.gz&#39; are not implemented yet!&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GraphCorpus"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.conversion.GraphCorpus">[docs]</a><span class="k">class</span> <span class="nc">GraphCorpus</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The :class:`~bibliometa.graph.conversion.GraphCorpus` provides a static function to create a graph corpus</span>
+<span class="sd">    in JSON format. It is needed in the conversion from JSON to an edge list representation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="GraphCorpus.create"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.conversion.GraphCorpus.create">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a graph corpus.</span>
+
+<span class="sd">        :param data: Dictionary containing data  sets</span>
+<span class="sd">        :type data: `dict`</span>
+<span class="sd">        :param config: Configuration object</span>
+<span class="sd">        :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">        :return: Graph corpus</span>
+<span class="sd">        :rtype: `dict`</span>
+<span class="sd">        :raise FileNotFoundError: If graph corpus can not be written to file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_create_swap</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;Create a corpus where unique values from the input data become the keys</span>
+<span class="sd">            and keys from the input data become the values.</span>
+
+<span class="sd">            :return: Graph corpus</span>
+<span class="sd">            :rtype: `dict`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">_corpus</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">_unique_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># Collect unique data values as corpus keys,</span>
+            <span class="c1"># consider only those fields that are defined in the configuration</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">subfield</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">subfield</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">values</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">field</span><span class="p">][</span><span class="n">subfield</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">_unique_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+            <span class="n">_unique_values</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_unique_values</span><span class="p">))</span>
+
+            <span class="c1"># Fill graph corpus</span>
+            <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">_unique_values</span><span class="p">))</span> <span class="k">as</span> <span class="n">progressbar</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">_unique_values</span><span class="p">:</span>
+                    <span class="n">_corpus</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">subfield</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                <span class="k">if</span> <span class="n">subfield</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                                    <span class="n">sf_values</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">field</span><span class="p">][</span><span class="n">subfield</span><span class="p">]</span>
+                                    <span class="k">for</span> <span class="n">sf_value</span> <span class="ow">in</span> <span class="n">sf_values</span><span class="p">:</span>
+                                        <span class="k">if</span> <span class="n">sf_value</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>
+                                            <span class="n">_corpus</span><span class="p">[</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                                            <span class="n">_corpus</span><span class="p">[</span><span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_corpus</span><span class="p">[</span><span class="n">value</span><span class="p">]))</span>
+                    <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Corpus keys: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">_corpus</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">_corpus</span>
+
+        <span class="k">def</span> <span class="nf">_create_original</span><span class="p">():</span>
+            <span class="sd">&quot;&quot;&quot;Create a corpus where keys and values from the input data also become keys</span>
+<span class="sd">            and values in the graph corpus.</span>
+
+<span class="sd">            :return: Graph corpus</span>
+<span class="sd">            :rtype: `dict`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">_corpus</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">_unique_values</span> <span class="o">=</span> <span class="p">[]</span>
+
+            <span class="c1"># use keys from import file as corpus keys</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">_corpus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">field</span><span class="p">,</span> <span class="n">subfield</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">fields</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">subfield</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">field</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                            <span class="n">values</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">field</span><span class="p">][</span><span class="n">subfield</span><span class="p">]</span>
+                            <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">values</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="n">_unique_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                                    <span class="n">_corpus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+                                    <span class="n">_corpus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">_corpus</span><span class="p">[</span><span class="n">key</span><span class="p">]))</span>
+
+                <span class="c1"># remove empty dictionary items</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">_corpus</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="n">_corpus</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+            <span class="n">_unique_values</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">_unique_values</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Corpus keys: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">_corpus</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unique values: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">_unique_values</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">_corpus</span>
+
+        <span class="c1"># class action starts here</span>
+        <span class="n">corpus</span> <span class="o">=</span> <span class="n">_create_swap</span><span class="p">()</span> <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">swap</span> <span class="k">else</span> <span class="n">_create_original</span><span class="p">()</span>
+
+        <span class="c1"># Write corpus to file</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">corpus</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">DictUtils</span><span class="o">.</span><span class="n">save_to_json</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Corpus written to file </span><span class="si">{</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span>
+
+        <span class="k">return</span> <span class="n">corpus</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Andreas Lüschow.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>bibliometa.utils.utils &mdash; Bibliometa  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Bibliometa
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <!-- Local TOC -->
+              <div class="local-toc"></div>
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Bibliometa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bibliometa.utils.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bibliometa.utils.utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;This module provides utility classes and functions whose usage is not limited to a specific context.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">bibliometa.config</span> <span class="kn">import</span> <span class="n">LOGGING_FILENAME</span><span class="p">,</span> <span class="n">LOGGING_FORMAT</span>
+
+
+<div class="viewcode-block" id="MainUtils"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.MainUtils">[docs]</a><span class="k">class</span> <span class="nc">MainUtils</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The :class:`~bibliometa.utils.utils.MainUtils` provides generic utilities.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MainUtils.get_file_info"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.MainUtils.get_file_info">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_file_info</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get filename, suffix and file extension from a path.</span>
+
+<span class="sd">        :param path: Path to a file</span>
+<span class="sd">        :type path: `str`</span>
+<span class="sd">        :param suffix: Suffix that should be added to a filename (optional)</span>
+<span class="sd">        :type suffix: `str`</span>
+<span class="sd">        :return: Filename, suffix and file extension</span>
+<span class="sd">        :rtype: tuple of `str`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+
+        <span class="n">s</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">_get_suffix</span><span class="p">(</span><span class="n">suffix</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">filename</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">ext</span></div>
+
+<div class="viewcode-block" id="MainUtils._get_suffix"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.MainUtils._get_suffix">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_suffix</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a filename suffix by adding an underscore before parameter `s`.</span>
+
+<span class="sd">        :param s: Suffix that will be preceded by an underscore</span>
+<span class="sd">        :type s: `str`</span>
+<span class="sd">        :return: &quot;_&quot; + suffix, if suffix length &gt; 0</span>
+<span class="sd">        :rtype: `str`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">suffix</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">suffix</span></div>
+
+<div class="viewcode-block" id="MainUtils.get_factor"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.MainUtils.get_factor">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_factor</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate factor to keep max value of progress bar below 100.</span>
+
+<span class="sd">        :param size: Number of total values</span>
+<span class="sd">        :type size: `int`</span>
+<span class="sd">        :return: Factor by which number of values needs to be divided</span>
+<span class="sd">        :rtype: `int`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">while</span> <span class="n">size</span> <span class="o">&gt;</span> <span class="mi">100</span><span class="p">:</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">size</span> <span class="o">/</span> <span class="mi">10</span><span class="p">)</span>
+            <span class="n">factor</span> <span class="o">*=</span> <span class="mi">10</span>
+        <span class="k">return</span> <span class="n">factor</span></div></div>
+
+
+<div class="viewcode-block" id="DictUtils"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.DictUtils">[docs]</a><span class="k">class</span> <span class="nc">DictUtils</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The :class:`~bibliometa.utils.utils.DictUtils` provides generic utilities.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Default values</span>
+    <span class="n">_ENCODING</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span>
+
+<div class="viewcode-block" id="DictUtils.remove_keys"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.DictUtils.remove_keys">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_keys</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">o</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">_ENCODING</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove all keys from a given dict i (in a JSON file) if not in k and save the remaining dict as JSON in o.</span>
+
+<span class="sd">        :param i: Path to input JSON file</span>
+<span class="sd">        :type i: `str`</span>
+<span class="sd">        :param o: Path to output JSON file</span>
+<span class="sd">        :type o: `str`</span>
+<span class="sd">        :param k: List of keys to be removed</span>
+<span class="sd">        :type k: `list`</span>
+<span class="sd">        :param encoding: File encoding</span>
+<span class="sd">        :type encoding: `str`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set up logging</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">LOGGING_FILENAME</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">LOGGING_FORMAT</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;DEBUG&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="s2">&quot;INFO&quot;</span><span class="p">)</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">in_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+        <span class="n">out_data</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">in_data</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                <span class="n">out_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">in_data</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">o</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">out_data</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Keys from </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2"> were removed (except keys in </span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">). New dictionary was written to </span><span class="si">{</span><span class="n">o</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="DictUtils.remove_empty_entries"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.DictUtils.remove_empty_entries">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">remove_empty_entries</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Remove keys from dict d that have no values.</span>
+
+<span class="sd">        :param d: A dictionary</span>
+<span class="sd">        :type d: `dict`</span>
+<span class="sd">        :return: Input dictionary without empty entries.</span>
+<span class="sd">        :rtype: `dict`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{</span>
+                <span class="n">k</span><span class="p">:</span> <span class="n">v</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="p">((</span><span class="n">k</span><span class="p">,</span> <span class="n">DictUtils</span><span class="o">.</span><span class="n">remove_empty_entries</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">v</span>
+            <span class="p">}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">v</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">map</span><span class="p">(</span><span class="n">DictUtils</span><span class="o">.</span><span class="n">remove_empty_entries</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="k">if</span> <span class="n">v</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">d</span></div>
+
+<div class="viewcode-block" id="DictUtils.merge"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.DictUtils.merge">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Merge two dictionaries.</span>
+
+<span class="sd">        :param a: A dictionary</span>
+<span class="sd">        :type a: `dict`</span>
+<span class="sd">        :param b: Another dictionary</span>
+<span class="sd">        :type b: `dict`</span>
+<span class="sd">        :raise: KeyError if a key is found in both dictionaries</span>
+<span class="sd">        :return: Dictionary a merged with b</span>
+<span class="sd">        :rtype: `dict`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">intersection</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">b</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Duplicate key found: </span><span class="si">{</span><span class="n">intersection</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">a</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">a</span></div>
+
+<div class="viewcode-block" id="DictUtils.get_top_keys"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.DictUtils.get_top_keys">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_top_keys</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">k</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get keys with highest values from a dictionary.</span>
+
+<span class="sd">        :param d: A dictionary</span>
+<span class="sd">        :type d: `dict`</span>
+<span class="sd">        :param k: Top k elements that will be returned</span>
+<span class="sd">        :type k: `int`</span>
+<span class="sd">        :return: List of tuples (value, key) for top k keys</span>
+<span class="sd">        :rtype: `list`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">items</span><span class="p">[:</span><span class="n">k</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="DictUtils.sort_by_key"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.DictUtils.sort_by_key">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">sort_by_key</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Sort a dictionary alphabetically by its keys.</span>
+
+<span class="sd">        :param d: A dictionary</span>
+<span class="sd">        :type d: `dict`</span>
+<span class="sd">        :return: The sorted dictionary</span>
+<span class="sd">        :rtype: `dict`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])))</span></div>
+
+<div class="viewcode-block" id="DictUtils.save_to_json"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.DictUtils.save_to_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">save_to_json</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">_ENCODING</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Save a dictionary to a JSON file.</span>
+
+<span class="sd">        :param d: A dictionary</span>
+<span class="sd">        :type d: `dict`</span>
+<span class="sd">        :param f: Path to file</span>
+<span class="sd">        :type f: `str`</span>
+<span class="sd">        :param encoding: File encoding</span>
+<span class="sd">        :type encoding: `str`</span>
+<span class="sd">        :raise FileNotFoundError: If f does not point to a file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">file</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span></div>
+
+<div class="viewcode-block" id="DictUtils.read_from_json"><a class="viewcode-back" href="../../../bibliometa.utils.html#bibliometa.utils.utils.DictUtils.read_from_json">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_from_json</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">_ENCODING</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read a dictionary from a JSON file.</span>
+
+<span class="sd">        :param f: Path to file</span>
+<span class="sd">        :type f: `str`</span>
+<span class="sd">        :param encoding: File encoding</span>
+<span class="sd">        :type encoding: `str`</span>
+<span class="sd">        :return: Dictionary loaded from JSON file</span>
+<span class="sd">        :rtype: `dict`</span>
+<span class="sd">        :raise FileNotFoundError: If f does not point to a file</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">e</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Andreas Lüschow.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

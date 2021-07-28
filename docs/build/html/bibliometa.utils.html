@@ -1,0 +1,435 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>bibliometa.utils package &mdash; Bibliometa  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="bibliometa.graph package" href="bibliometa.graph.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Bibliometa
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">bibliometa</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="bibliometa.html">bibliometa package</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="bibliometa.html#subpackages">Subpackages</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="bibliometa.graph.html">bibliometa.graph package</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">bibliometa.utils package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="bibliometa.html#submodules">Submodules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bibliometa.html#module-bibliometa.config">bibliometa.config module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bibliometa.html#module-bibliometa.configuration">bibliometa.configuration module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bibliometa.html#module-bibliometa.conversion">bibliometa.conversion module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="bibliometa.html#module-bibliometa">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Bibliometa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="modules.html">bibliometa</a> &raquo;</li>
+        
+          <li><a href="bibliometa.html">bibliometa package</a> &raquo;</li>
+        
+      <li>bibliometa.utils package</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/bibliometa.utils.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="bibliometa-utils-package">
+<h1>bibliometa.utils package<a class="headerlink" href="#bibliometa-utils-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-bibliometa.utils.archives">
+<span id="bibliometa-utils-archives-module"></span><h2>bibliometa.utils.archives module<a class="headerlink" href="#module-bibliometa.utils.archives" title="Permalink to this headline">¶</a></h2>
+<p>This module provides utilities to handle tar files.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="bibliometa.utils.archives.tar">
+<span class="sig-prename descclassname"><span class="pre">bibliometa.utils.archives.</span></span><span class="sig-name descname"><span class="pre">tar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/archives.html#tar"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.archives.tar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Put contents from <cite>path</cite> to tar.gz archive in <cite>name</cite>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-bibliometa.utils.utils">
+<span id="bibliometa-utils-utils-module"></span><h2>bibliometa.utils.utils module<a class="headerlink" href="#module-bibliometa.utils.utils" title="Permalink to this headline">¶</a></h2>
+<p>This module provides utility classes and functions whose usage is not limited to a specific context.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.DictUtils">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">bibliometa.utils.utils.</span></span><span class="sig-name descname"><span class="pre">DictUtils</span></span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#DictUtils"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.DictUtils" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <a class="reference internal" href="#bibliometa.utils.utils.DictUtils" title="bibliometa.utils.utils.DictUtils"><code class="xref py py-class docutils literal notranslate"><span class="pre">DictUtils</span></code></a> provides generic utilities.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.DictUtils.get_top_keys">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_top_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#DictUtils.get_top_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.DictUtils.get_top_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get keys with highest values from a dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<cite>dict</cite>) – A dictionary</p></li>
+<li><p><strong>k</strong> (<cite>int</cite>) – Top k elements that will be returned</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>List of tuples (value, key) for top k keys</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>list</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.DictUtils.merge">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">b</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#DictUtils.merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.DictUtils.merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Merge two dictionaries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>a</strong> (<cite>dict</cite>) – A dictionary</p></li>
+<li><p><strong>b</strong> (<cite>dict</cite>) – Another dictionary</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raise</dt>
+<dd class="field-even"><p>KeyError if a key is found in both dictionaries</p>
+</dd>
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dictionary a merged with b</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.DictUtils.read_from_json">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">read_from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#DictUtils.read_from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.DictUtils.read_from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read a dictionary from a JSON file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>f</strong> (<cite>str</cite>) – Path to file</p></li>
+<li><p><strong>encoding</strong> (<cite>str</cite>) – File encoding</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Dictionary loaded from JSON file</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If f does not point to a file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.DictUtils.remove_empty_entries">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">remove_empty_entries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#DictUtils.remove_empty_entries"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.DictUtils.remove_empty_entries" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove keys from dict d that have no values.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<cite>dict</cite>) – A dictionary</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input dictionary without empty entries.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.DictUtils.remove_keys">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">remove_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">o</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#DictUtils.remove_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.DictUtils.remove_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all keys from a given dict i (in a JSON file) if not in k and save the remaining dict as JSON in o.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> (<cite>str</cite>) – Path to input JSON file</p></li>
+<li><p><strong>o</strong> (<cite>str</cite>) – Path to output JSON file</p></li>
+<li><p><strong>k</strong> (<cite>list</cite>) – List of keys to be removed</p></li>
+<li><p><strong>encoding</strong> (<cite>str</cite>) – File encoding</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.DictUtils.save_to_json">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">save_to_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#DictUtils.save_to_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.DictUtils.save_to_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a dictionary to a JSON file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>d</strong> (<cite>dict</cite>) – A dictionary</p></li>
+<li><p><strong>f</strong> (<cite>str</cite>) – Path to file</p></li>
+<li><p><strong>encoding</strong> (<cite>str</cite>) – File encoding</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>FileNotFoundError</strong> – If f does not point to a file</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.DictUtils.sort_by_key">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">sort_by_key</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">d</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#DictUtils.sort_by_key"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.DictUtils.sort_by_key" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sort a dictionary alphabetically by its keys.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>d</strong> (<cite>dict</cite>) – A dictionary</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The sorted dictionary</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>dict</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.MainUtils">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">bibliometa.utils.utils.</span></span><span class="sig-name descname"><span class="pre">MainUtils</span></span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#MainUtils"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.MainUtils" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>The <a class="reference internal" href="#bibliometa.utils.utils.MainUtils" title="bibliometa.utils.utils.MainUtils"><code class="xref py py-class docutils literal notranslate"><span class="pre">MainUtils</span></code></a> provides generic utilities.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.MainUtils.get_factor">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_factor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">size</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#MainUtils.get_factor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.MainUtils.get_factor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate factor to keep max value of progress bar below 100.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>size</strong> (<cite>int</cite>) – Number of total values</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Factor by which number of values needs to be divided</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>int</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bibliometa.utils.utils.MainUtils.get_file_info">
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">get_file_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suffix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/utils/utils.html#MainUtils.get_file_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.utils.utils.MainUtils.get_file_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get filename, suffix and file extension from a path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<cite>str</cite>) – Path to a file</p></li>
+<li><p><strong>suffix</strong> (<cite>str</cite>) – Suffix that should be added to a filename (optional)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Filename, suffix and file extension</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>tuple of <cite>str</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-bibliometa.utils">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-bibliometa.utils" title="Permalink to this headline">¶</a></h2>
+<p>Utilities package for Bibliometa.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="bibliometa.graph.html" class="btn btn-neutral float-left" title="bibliometa.graph package" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Andreas Lüschow.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,454 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>bibliometa.graph.utils &mdash; Bibliometa  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Bibliometa
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">bibliometa</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Bibliometa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bibliometa.graph.utils</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bibliometa.graph.utils</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;This module provides utility classes and functions for graphs.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="kn">from</span> <span class="nn">operator</span> <span class="kn">import</span> <span class="n">itemgetter</span>
+
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="kn">from</span> <span class="nn">bibliometa.utils.utils</span> <span class="kn">import</span> <span class="n">MainUtils</span>
+
+<span class="n">_ENCODING</span> <span class="o">=</span> <span class="s2">&quot;utf-8&quot;</span>
+
+
+<div class="viewcode-block" id="load_graph"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.utils.load_graph">[docs]</a><span class="k">def</span> <span class="nf">load_graph</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">reload</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Load a graph from a GraphML or similarity file.</span>
+
+<span class="sd">    :param config: Configuration object</span>
+<span class="sd">    :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">    :param reload: If graph will be loaded directly from similarity file</span>
+<span class="sd">    :type reload: `bool`</span>
+<span class="sd">    :return: Graph</span>
+<span class="sd">    :rtype: `networkx.Graph`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># get reload configuration parameter if available</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">reload</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">reload</span>
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="k">pass</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">reload</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">graphml</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">graphml</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.graphml&quot;</span><span class="p">):</span>
+                <span class="n">_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">graphml</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span>
+                    <span class="n">config</span><span class="o">.</span><span class="n">graphml</span> <span class="o">+</span> <span class="n">config</span><span class="o">.</span><span class="n">config_id</span> <span class="o">+</span> <span class="s2">&quot;.graphml&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span>
+                <span class="p">)</span>
+                <span class="n">_path</span> <span class="o">=</span> <span class="n">filename</span> <span class="o">+</span> <span class="n">ext</span> <span class="o">+</span> <span class="n">suffix</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Configuration parameter &#39;graphml&#39; is not defined!&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Import from .graphml file </span><span class="si">{</span><span class="n">_path</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="n">graph</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">read_graphml</span><span class="p">(</span><span class="n">_path</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Import finished.&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GraphML file at </span><span class="si">{</span><span class="n">_path</span><span class="si">}</span><span class="s2"> can not be found. If using JSON2EdgeList, &quot;</span>
+                                    <span class="s2">&quot;do you need to set config.reload to True?&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Create graph from information in file </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">i</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+        <span class="n">graph</span> <span class="o">=</span> <span class="n">read_file</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Graph creation finished.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">graph</span></div>
+
+
+<div class="viewcode-block" id="read_file"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.utils.read_file">[docs]</a><span class="k">def</span> <span class="nf">read_file</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">_ENCODING</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create graph by reading in a similarity file.</span>
+
+<span class="sd">    :param config: Configuration object</span>
+<span class="sd">    :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">    :param encoding: File encoding</span>
+<span class="sd">    :type encoding: `str`</span>
+<span class="sd">    :return: Graph</span>
+<span class="sd">    :rtype: `networkx.Graph`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">g</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+
+    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">i</span><span class="p">,</span> <span class="n">chunksize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">chunksize</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">csv_sep</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">low_memory</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                          <span class="n">compression</span><span class="o">=</span><span class="s1">&#39;gzip&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                          <span class="n">usecols</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">sim_functions</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">sim</span><span class="p">)</span> <span class="o">+</span> <span class="mi">3</span><span class="p">],</span>
+                          <span class="n">names</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">,</span> <span class="s1">&#39;nodea&#39;</span><span class="p">,</span> <span class="s1">&#39;nodeb&#39;</span><span class="p">,</span> <span class="s1">&#39;sim&#39;</span><span class="p">]):</span>
+        <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Import datasets ...&quot;</span><span class="p">)</span>  <span class="c1"># (up to {count * config.chunksize / 1000000} million) ...&quot;)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="nb">tuple</span><span class="p">(</span><span class="n">itemgetter</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)(</span><span class="n">x</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">values</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">i</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">config</span><span class="o">.</span><span class="n">t</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">g</span><span class="o">.</span><span class="n">add_weighted_edges_from</span><span class="p">([</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;can not add weighted edge from </span><span class="si">{</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="si">}</span><span class="s2"> in chunk </span><span class="si">{</span><span class="n">count</span> <span class="o">*</span> <span class="n">config</span><span class="o">.</span><span class="n">chunksize</span><span class="si">}</span><span class="s2">, error </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Import finished!&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">create_graphml</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">graphml</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.graphml&quot;</span><span class="p">):</span>
+            <span class="n">_path</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">graphml</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span>
+                <span class="n">config</span><span class="o">.</span><span class="n">graphml</span> <span class="o">+</span> <span class="n">config</span><span class="o">.</span><span class="n">config_id</span> <span class="o">+</span> <span class="s2">&quot;.graphml&quot;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span>
+            <span class="p">)</span>
+            <span class="n">_path</span> <span class="o">=</span> <span class="n">filename</span> <span class="o">+</span> <span class="n">ext</span> <span class="o">+</span> <span class="n">suffix</span>
+
+        <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saving graph as .graphml file ...&quot;</span><span class="p">)</span>
+        <span class="n">nx</span><span class="o">.</span><span class="n">write_graphml</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">_path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Saved .graphml file successfully.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">g</span></div>
+
+
+<div class="viewcode-block" id="save_file"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.utils.save_file">[docs]</a><span class="k">def</span> <span class="nf">save_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">results</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">_ENCODING</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Save results in a text file.</span>
+
+<span class="sd">    :param path: Path to output file</span>
+<span class="sd">    :type path: `str`</span>
+<span class="sd">    :param results: List containing results from graph analysis</span>
+<span class="sd">    :type results: `list`</span>
+<span class="sd">    :param encoding: Encoding of file</span>
+<span class="sd">    :type encoding: `str`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dirname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">dirname</span><span class="p">):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">dirname</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">results</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_nodes"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.utils.get_nodes">[docs]</a><span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">_ENCODING</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get nodes and their degrees from a graph.</span>
+
+<span class="sd">    :param graph: Graph object</span>
+<span class="sd">    :type graph: `networkx.Graph`</span>
+<span class="sd">    :param config: Configuration object</span>
+<span class="sd">    :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">    :param encoding: File encoding</span>
+<span class="sd">    :type encoding: `str`</span>
+<span class="sd">    :return: Dictionary of nodes with their degrees</span>
+<span class="sd">    :rtype: `dict`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">graph</span><span class="o">.</span><span class="n">degree</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">()}</span>
+    <span class="n">nodes</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">nodes</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">item</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+
+    <span class="n">_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">degrees</span><span class="si">}</span><span class="s2">degrees_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_path</span><span class="p">)):</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_path</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_path</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">encoding</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">nodes</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nodes</span></div>
+
+
+<div class="viewcode-block" id="update_graph"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.utils.update_graph">[docs]</a><span class="k">def</span> <span class="nf">update_graph</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">col</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove nodes from graph that do not appear in column col in DataFrame df.</span>
+
+<span class="sd">    :param graph: Graph object</span>
+<span class="sd">    :type graph: `networkx.Graph`</span>
+<span class="sd">    :param df: DataFrame</span>
+<span class="sd">    :type df: `pandas.DataFrame`</span>
+<span class="sd">    :param col: Column in DataFrame</span>
+<span class="sd">    :type col: `str`</span>
+<span class="sd">    :return: Updated Graph object</span>
+<span class="sd">    :rtype: `networkx.Graph`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">remove_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of nodes in the graph (before update): </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">n</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">col</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+            <span class="n">remove_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">remove_list</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">graph</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Number of nodes in the graph (after update): </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">graph</span></div>
+
+
+<div class="viewcode-block" id="get_subgraph"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.utils.get_subgraph">[docs]</a><span class="k">def</span> <span class="nf">get_subgraph</span><span class="p">(</span><span class="n">graph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get largest connected component from graph.</span>
+
+<span class="sd">    :param graph: Graph object</span>
+<span class="sd">    :type graph: `networkx.Graph`</span>
+<span class="sd">    :return: Largest component</span>
+<span class="sd">    :rtype: `networkx.Graph`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">subgraphs</span> <span class="o">=</span> <span class="p">[</span><span class="n">graph</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">c</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="n">graph</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">else</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="n">graph</span><span class="p">)]</span>
+    <span class="c1"># TODO: Falls len(subgraphs) &gt; 0: abfangen (keine Übereinstimmung zwischen coordinates[geo_col] und nodes ...)</span>
+
+    <span class="n">maxlen</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">largest</span> <span class="o">=</span> <span class="n">subgraphs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">subgraphs</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">maxlen</span><span class="p">:</span>
+            <span class="n">largest</span> <span class="o">=</span> <span class="n">x</span>
+            <span class="n">maxlen</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">subgraphs</span><span class="p">)</span><span class="si">}</span><span class="s2"> components found, only use largest component with size </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">largest</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">largest</span></div>
+
+
+<div class="viewcode-block" id="get_graph_attributes"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.utils.get_graph_attributes">[docs]</a><span class="k">def</span> <span class="nf">get_graph_attributes</span><span class="p">(</span><span class="n">graph</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get degrees, labels and sizes for a graph.</span>
+
+<span class="sd">    :param graph: Graph object</span>
+<span class="sd">    :type graph: `networkx.Graph`</span>
+<span class="sd">    :return: Dictionary with degrees, labels, sizes</span>
+<span class="sd">    :rtype: `dict`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">degrees</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">degree</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">n</span><span class="p">:</span> <span class="n">n</span> <span class="k">if</span> <span class="n">degrees</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">}</span>
+    <span class="n">sizes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span> <span class="o">*</span> <span class="n">degrees</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;degrees&quot;</span><span class="p">:</span> <span class="n">degrees</span><span class="p">,</span>
+            <span class="s2">&quot;labels&quot;</span><span class="p">:</span> <span class="n">labels</span><span class="p">,</span>
+            <span class="s2">&quot;sizes&quot;</span><span class="p">:</span> <span class="n">sizes</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="create_pos"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.utils.create_pos">[docs]</a><span class="k">def</span> <span class="nf">create_pos</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">df</span><span class="p">,</span> <span class="n">geo_col</span><span class="p">,</span> <span class="n">verbose</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create dictionary with node positions.</span>
+
+<span class="sd">    :param graph: Graph object</span>
+<span class="sd">    :type graph: `networkx.Graph`</span>
+<span class="sd">    :param df: DataFrame with geographical information</span>
+<span class="sd">    :type df: `pandas.DataFrame`</span>
+<span class="sd">    :param geo_col: Column in DataFrame</span>
+<span class="sd">    :type geo_col: `str`</span>
+<span class="sd">    :param verbose: Verbose parameter</span>
+<span class="sd">    :type verbose: `bool`</span>
+<span class="sd">    :return: Dictionary of positions</span>
+<span class="sd">    :rtype: `dict`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">graph</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+        <span class="n">lat</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">geo_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span><span class="p">][</span><span class="s2">&quot;lat&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">lng</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">geo_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">n</span><span class="p">][</span><span class="s2">&quot;lng&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">pos</span><span class="p">[</span><span class="n">n</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">lng</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">lat</span><span class="p">))</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Positions: </span><span class="si">{</span><span class="n">pos</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pos</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Andreas Lüschow.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

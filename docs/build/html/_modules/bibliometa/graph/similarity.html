@@ -1,0 +1,401 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>bibliometa.graph.similarity &mdash; Bibliometa  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Bibliometa
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">bibliometa</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Bibliometa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bibliometa.graph.similarity</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bibliometa.graph.similarity</h1><div class="highlight"><pre>
+<span></span><span class="c1"># !/usr/bin/python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;This module provides a class for similarity function definitions and similarity calculations.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">scipy.special</span> <span class="kn">import</span> <span class="n">binom</span>
+<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">bibliometa.utils.utils</span> <span class="kn">import</span> <span class="n">MainUtils</span>
+
+
+<div class="viewcode-block" id="Similarity"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.similarity.Similarity">[docs]</a><span class="k">class</span> <span class="nc">Similarity</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The :class:`~bibliometa.graph.similarity.Similarity` provides functions to define and calculate</span>
+<span class="sd">    different types of similarity.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Similarity.calculate"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.similarity.Similarity.calculate">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">calculate</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Calculate similarity between data sets.</span>
+
+<span class="sd">        :param corpus: Graph corpus that contains the data on which similarity calculation will be based</span>
+<span class="sd">        :type corpus: `dict`</span>
+<span class="sd">        :param config: Configuration object</span>
+<span class="sd">        :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">record_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># calculate size of progress bar</span>
+        <span class="n">combinations</span> <span class="o">=</span> <span class="n">binom</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">corpus</span><span class="o">.</span><span class="n">keys</span><span class="p">())),</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_factor</span><span class="p">(</span><span class="n">combinations</span><span class="p">)</span>
+        <span class="n">progress_max_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">combinations</span> <span class="o">/</span> <span class="n">factor</span><span class="p">)</span>
+
+        <span class="c1"># Calculate similarity for each node--node pair in the corpus</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">progress_max_value</span><span class="p">)</span> <span class="k">as</span> <span class="n">progressbar</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key1</span><span class="p">,</span> <span class="n">key2</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">corpus</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+                <span class="n">similarity_dict</span> <span class="o">=</span> <span class="n">Similarity</span><span class="o">.</span><span class="n">_get_similarity</span><span class="p">(</span>
+                    <span class="nb">set</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="n">key1</span><span class="p">]),</span> <span class="nb">set</span><span class="p">(</span><span class="n">corpus</span><span class="p">[</span><span class="n">key2</span><span class="p">]),</span> <span class="n">config</span><span class="o">.</span><span class="n">sim_functions</span>
+                <span class="p">)</span>
+                <span class="c1"># consider this combination only if at least one similarity function returned a value &gt; 0</span>
+                <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">x</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">similarity_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())):</span>
+                    <span class="n">_tmp_results</span> <span class="o">=</span> <span class="p">[</span><span class="n">record_count</span><span class="p">,</span> <span class="n">key1</span><span class="p">,</span> <span class="n">key2</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">similarity_dict</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">similarity_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+                    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_tmp_results</span><span class="p">)</span>
+
+                <span class="c1"># get progress</span>
+                <span class="n">record_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">if</span> <span class="n">record_count</span> <span class="o">%</span> <span class="n">factor</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+            <span class="n">progressbar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+            <span class="c1"># TODO: implement chunks for larger data sets? If yes, also implement saving temporary results/progress</span>
+            <span class="n">progress</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">Similarity</span><span class="o">.</span><span class="n">_write_results_and_progress</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">progress</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_get_similarity</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">sim_functions</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get similarity between a and b for different similarity functions. Get arguments that need to</span>
+<span class="sd">        be passed to similarity functions from configuration, where necessary.</span>
+
+<span class="sd">        :param a: Set of values for item a</span>
+<span class="sd">        :type a: `set`</span>
+<span class="sd">        :param b: Set of values for item b</span>
+<span class="sd">        :type b: `set`</span>
+<span class="sd">        :param sim_functions: Similarity functions</span>
+<span class="sd">        :type sim_functions: `list` of `dict`</span>
+<span class="sd">        :return: OrderedDict with similarity functions as keys and their values</span>
+<span class="sd">        :rtype: `OrderedDict`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+
+        <span class="c1"># default arguments for similarity functions</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># function that calculates similarity value</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># threshold for similarity value</span>
+
+        <span class="c1"># iterate over similarity functions, get arguments and call the function</span>
+        <span class="k">for</span> <span class="n">sim_func</span> <span class="ow">in</span> <span class="n">sim_functions</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s2">&quot;args&quot;</span> <span class="ow">in</span> <span class="n">sim_func</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;f&quot;</span> <span class="ow">in</span> <span class="n">sim_func</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]:</span>
+                    <span class="n">f</span> <span class="o">=</span> <span class="n">sim_func</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="s2">&quot;f&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;t&quot;</span> <span class="ow">in</span> <span class="n">sim_func</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]:</span>
+                    <span class="n">t</span> <span class="o">=</span> <span class="n">sim_func</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">][</span><span class="s2">&quot;t&quot;</span><span class="p">]</span>
+
+            <span class="n">d</span><span class="p">[</span><span class="n">sim_func</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">sim_func</span><span class="p">[</span><span class="s2">&quot;function&quot;</span><span class="p">](</span>
+                <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">t</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">d</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_write_results_and_progress</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">progress</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Write (temporary) results and progress to the appropriate files.</span>
+
+<span class="sd">        :param results: List of similarity results for node-node pairs</span>
+<span class="sd">        :type results: `list`</span>
+<span class="sd">        :param config: Configuration object</span>
+<span class="sd">        :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">        :param progress: Progress values</span>
+<span class="sd">        :type progress: `float`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">wr</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">csv_sep</span><span class="p">)</span>
+            <span class="n">wr</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(Temporary) Results written to file </span><span class="si">{</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="s2">&quot;_progress&quot;</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">newline</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">progress</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Progress written to file </span><span class="si">{</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Similarity.Functions"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.similarity.Similarity.Functions">[docs]</a>    <span class="k">class</span> <span class="nc">Functions</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;This class contains predefined similarity functions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Similarity.Functions.mint"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.similarity.Similarity.Functions.mint">[docs]</a>        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">mint</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;a and b are considered similar if the size of their intersection is greater than or</span>
+<span class="sd">            equal to t.</span>
+
+<span class="sd">            :param a: Set of values for item a</span>
+<span class="sd">            :type a: `set`</span>
+<span class="sd">            :param b: Set of values for item b</span>
+<span class="sd">            :type b: `set`</span>
+<span class="sd">            :param f: This value (or the result of this function) will be returned if similarity between</span>
+<span class="sd">                a and b &gt;= t</span>
+<span class="sd">            :type f: function or `int`</span>
+<span class="sd">            :param t: Threshold</span>
+<span class="sd">            :type t: `int`</span>
+<span class="sd">            :return: Similarity value</span>
+<span class="sd">            :rtype: `float` or `int`</span>
+<span class="sd">            :raise ValueError: If f is neither a function nor an `int` or `float`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span> <span class="o">&gt;=</span> <span class="n">t</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">f</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span> <span class="o">&gt;=</span> <span class="n">t</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;f&#39; is neither function nor int or float!&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Similarity.Functions.jaccard"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.similarity.Similarity.Functions.jaccard">[docs]</a>        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">jaccard</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;The Jaccard Index. a and b are considered similar if the size of their intersection divided by their</span>
+<span class="sd">            union is greater than or equal to t.</span>
+
+<span class="sd">            :param a: Set of values for item a</span>
+<span class="sd">            :type a: `set`</span>
+<span class="sd">            :param b: Set of values for item b</span>
+<span class="sd">            :type b: `set`</span>
+<span class="sd">            :param f: This value (or the result of this function) will be returned if similarity between</span>
+<span class="sd">                a and b &gt;= t</span>
+<span class="sd">            :type f: function or `int`</span>
+<span class="sd">            :param t: Threshold</span>
+<span class="sd">            :type t: `int`</span>
+<span class="sd">            :return: Similarity value</span>
+<span class="sd">            :rtype: `float` or `int`</span>
+<span class="sd">            :raise ValueError: If f is neither a function nor an `int` or `float`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">intersection</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+            <span class="n">union</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="p">))</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span> <span class="o">-</span> <span class="n">intersection</span>
+            <span class="n">jacc</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">/</span> <span class="n">union</span>
+            <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">jacc</span><span class="p">)</span> <span class="k">if</span> <span class="n">union</span> <span class="o">&gt;</span> <span class="n">t</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">jacc</span> <span class="k">if</span> <span class="n">union</span> <span class="o">&gt;</span> <span class="n">t</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;f&#39; is neither function nor int or float!&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Similarity.Functions.overlap"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.similarity.Similarity.Functions.overlap">[docs]</a>        <span class="nd">@staticmethod</span>
+        <span class="k">def</span> <span class="nf">overlap</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">t</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+            <span class="sd">&quot;&quot;&quot;The overlap score. a and b are considered similar if the size of their intersection divided by the</span>
+<span class="sd">            minimum set length of a and b is greater than or equal to t.</span>
+
+<span class="sd">            :param a: Set of values for item a</span>
+<span class="sd">            :type a: `set`</span>
+<span class="sd">            :param b: Set of values for item b</span>
+<span class="sd">            :type b: `set`</span>
+<span class="sd">            :param f: This value (or the result of this function) will be returned if similarity between</span>
+<span class="sd">                a and b &gt;= t</span>
+<span class="sd">            :type f: function or `int`</span>
+<span class="sd">            :param t: Threshold</span>
+<span class="sd">            :type t: `int`</span>
+<span class="sd">            :return: Similarity value</span>
+<span class="sd">            :rtype: `float` or `int`</span>
+<span class="sd">            :raise ValueError: If f is neither a function nor an `int` or `float`</span>
+<span class="sd">            &quot;&quot;&quot;</span>
+            <span class="n">intersection</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+            <span class="n">ovlp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">intersection</span><span class="p">)</span> <span class="o">/</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="p">)),</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span>
+            <span class="k">if</span> <span class="n">callable</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">ovlp</span><span class="p">)</span> <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="p">)),</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">t</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">ovlp</span> <span class="k">if</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="p">)),</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">b</span><span class="p">)))</span> <span class="o">&gt;</span> <span class="n">t</span> <span class="k">else</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Parameter &#39;f&#39; is neither function nor int or float!&quot;</span><span class="p">)</span></div></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Andreas Lüschow.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

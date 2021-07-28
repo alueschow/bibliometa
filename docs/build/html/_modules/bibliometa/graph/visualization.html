@@ -1,0 +1,472 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>bibliometa.graph.visualization &mdash; Bibliometa  documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> Bibliometa
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">bibliometa</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">Bibliometa</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>bibliometa.graph.visualization</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for bibliometa.graph.visualization</h1><div class="highlight"><pre>
+<span></span><span class="c1"># !/usr/bin/python</span>
+<span class="c1"># -*- coding: utf-8 -*-</span>
+
+<span class="sd">&quot;&quot;&quot;This module provides classes and functions to visualize network data on geographical maps.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">import</span> <span class="nn">cartopy.crs</span> <span class="k">as</span> <span class="nn">ccrs</span>
+<span class="kn">import</span> <span class="nn">cartopy.io.shapereader</span> <span class="k">as</span> <span class="nn">shpreader</span>
+<span class="kn">import</span> <span class="nn">geopandas</span> <span class="k">as</span> <span class="nn">gpd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="kn">from</span> <span class="nn">loguru</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">text</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Point</span>
+
+<span class="kn">from</span> <span class="nn">bibliometa.config</span> <span class="kn">import</span> <span class="n">LOGGING_FORMAT</span><span class="p">,</span> <span class="n">GRAPH_VISUALISATION_MAP_CONFIG_DEFAULT</span>
+<span class="kn">from</span> <span class="nn">bibliometa.configuration</span> <span class="kn">import</span> <span class="n">BibliometaConfiguration</span>
+<span class="kn">from</span> <span class="nn">bibliometa.graph.utils</span> <span class="kn">import</span> <span class="n">load_graph</span><span class="p">,</span> <span class="n">update_graph</span><span class="p">,</span> <span class="n">get_nodes</span><span class="p">,</span> <span class="n">get_subgraph</span><span class="p">,</span> \
+    <span class="n">get_graph_attributes</span><span class="p">,</span> <span class="n">create_pos</span>
+
+
+<div class="viewcode-block" id="Map"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.Map">[docs]</a><span class="k">class</span> <span class="nc">Map</span><span class="p">(</span><span class="n">BibliometaConfiguration</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The :class:`~bibliometa.graph.visualization.Map` provides functions to visualize geographical network data on</span>
+<span class="sd">    a map.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a new :class:`~bibliometa.graph.visualization.Map`.&quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">GRAPH_VISUALISATION_MAP_CONFIG_DEFAULT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update configuration with class-specific values and check for configuration correctness.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shp</span> <span class="o">=</span> <span class="n">MapUtils</span><span class="o">.</span><span class="n">read_shp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">shapefile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">shapefile_color</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_shapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">shpreader</span><span class="o">.</span><span class="n">Reader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">shapefile</span><span class="p">)</span><span class="o">.</span><span class="n">geometries</span><span class="p">())</span>
+
+        <span class="c1"># TODO: not all cities in the CT are represented in this table.</span>
+        <span class="c1">#  Take the longitude/latitude from the CT instead?</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_df</span> <span class="o">=</span> <span class="n">MapUtils</span><span class="o">.</span><span class="n">convert_to_gdf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">coordinates</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">crs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">coordinates_sep</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">graph</span> <span class="o">=</span> <span class="n">load_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">reload</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="c1"># create dictionary of nodes and their node degrees</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span> <span class="o">=</span> <span class="n">get_nodes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">encoding</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">graphml</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">graphml</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Map.start"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.Map.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Start visualization.&quot;&quot;&quot;</span>
+        <span class="c1"># Set up logging</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="nb">format</span><span class="o">=</span><span class="n">LOGGING_FORMAT</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_level_file</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log_level_std</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start network creation.&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_update_config</span><span class="p">()</span>
+
+        <span class="c1"># plot all cities from city file as scatter plot</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Creating scatterplot.&quot;</span><span class="p">)</span>
+        <span class="n">Plotting</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># plot all cities from city file on map</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting all cities.&quot;</span><span class="p">)</span>
+        <span class="n">Plotting</span><span class="o">.</span><span class="n">cities</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># plot nodes on map</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting node degrees.&quot;</span><span class="p">)</span>
+        <span class="n">Plotting</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_shp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nodes</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># remove unneeded nodes from the graph</span>
+        <span class="n">update_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">geo_col</span><span class="p">)</span>
+
+        <span class="c1"># get largest component as subgraph and plot on map</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Plotting network on map.&quot;</span><span class="p">)</span>
+        <span class="n">subgraph</span> <span class="o">=</span> <span class="n">get_subgraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">)</span>
+        <span class="n">Plotting</span><span class="o">.</span><span class="n">graph_on_map</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_shapes</span><span class="p">,</span>
+                              <span class="n">subgraph</span><span class="p">,</span>
+                              <span class="n">get_graph_attributes</span><span class="p">(</span><span class="n">subgraph</span><span class="p">),</span>
+                              <span class="n">create_pos</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">graph</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_df</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">geo_col</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">),</span>
+                              <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Network creation finished.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Logfile written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">log</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Plotting"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.Plotting">[docs]</a><span class="k">class</span> <span class="nc">Plotting</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The :class:`~bibliometa.graph.visualization.Plotting` provides functions to plot network data.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Plotting.scatter"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.Plotting.scatter">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">scatter</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create scatter plot.</span>
+
+<span class="sd">        :param df: DataFrame with &#39;lng&#39; and &#39;lat&#39; column</span>
+<span class="sd">        :type df: `pandas.DataFrame`</span>
+<span class="sd">        :param config: Configuration object</span>
+<span class="sd">        :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plot</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;lng&#39;</span><span class="p">],</span> <span class="n">y</span><span class="o">=</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">o_formats</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="si">}</span><span class="s2">map_scatter_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Plotting.cities"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.Plotting.cities">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">cities</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">shp</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot cities on a certain map.</span>
+
+<span class="sd">        :param df: DataFrame with city information</span>
+<span class="sd">        :type df: `pandas.DataFrame`</span>
+<span class="sd">        :param shp: Shapefile</span>
+<span class="sd">        :type shp: GeoDataFrame</span>
+<span class="sd">        :param config: Configuration object</span>
+<span class="sd">        :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">plot</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">shp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">figsize</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">shapefile_color</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="mi">45</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">o_formats</span><span class="p">:</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plot</span><span class="o">.</span><span class="n">get_figure</span><span class="p">()</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="si">}</span><span class="s2">map_cities_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Plotting.degrees"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.Plotting.degrees">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">degrees</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">shp</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot graph with node degrees.</span>
+
+<span class="sd">        :param df: DataFrame with city information</span>
+<span class="sd">        :type df: `pandas.DataFrame`</span>
+<span class="sd">        :param nodes: Graph nodes with their degrees</span>
+<span class="sd">        :type nodes: `dict`</span>
+<span class="sd">        :param shp: Shapefile</span>
+<span class="sd">        :type shp: GeoDataFrame</span>
+<span class="sd">        :param config: Configuration object</span>
+<span class="sd">        :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">figsize</span><span class="p">)</span>
+        <span class="n">shp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">shapefile_color</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">city</span> <span class="ow">in</span> <span class="n">df</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">geo_col</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">():</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="n">config</span><span class="o">.</span><span class="n">geo_col</span><span class="p">]</span> <span class="o">==</span> <span class="n">city</span><span class="p">]</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">markersize</span><span class="o">=</span><span class="n">nodes</span><span class="p">[</span><span class="n">city</span><span class="p">],</span>
+                                                    <span class="n">color</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">degree_node_color</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">geometry</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">df</span><span class="o">.</span><span class="n">city</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">label</span><span class="p">,</span> <span class="n">xy</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">xytext</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="n">textcoords</span><span class="o">=</span><span class="s2">&quot;offset points&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">o_formats</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="si">}</span><span class="s2">map_degrees_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Plotting.graph_on_map"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.Plotting.graph_on_map">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">graph_on_map</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">subgraph</span><span class="p">,</span> <span class="n">attributes</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Plot graph on a map.</span>
+
+<span class="sd">        :param shapes: An iterator of shapely geometries from a shapefile</span>
+<span class="sd">        :type shapes: `list`</span>
+<span class="sd">        :param subgraph: Largest component of graph</span>
+<span class="sd">        :type subgraph: `networkx.Graph`</span>
+<span class="sd">        :param attributes: Dictionary of graph degrees, labels and sizes</span>
+<span class="sd">        :type attributes:  `dict`</span>
+<span class="sd">        :param pos: Dictionary of node positions</span>
+<span class="sd">        :type pos: `dict`</span>
+<span class="sd">        :param config: Configuration object</span>
+<span class="sd">        :type config: `bibliometa.configuration.Config`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">crs</span> <span class="o">=</span> <span class="n">ccrs</span><span class="o">.</span><span class="n">PlateCarree</span><span class="p">()</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">figsize</span><span class="p">,</span>
+                               <span class="n">subplot_kw</span><span class="o">=</span><span class="nb">dict</span><span class="p">(</span><span class="n">projection</span><span class="o">=</span><span class="n">crs</span><span class="p">))</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">add_geometries</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">coastlines</span><span class="p">()</span>
+        <span class="c1"># ax.set_global()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_extent</span><span class="p">([</span><span class="mf">5.5</span><span class="p">,</span> <span class="mf">15.5</span><span class="p">,</span> <span class="mf">47.2</span><span class="p">,</span> <span class="mf">55.3</span><span class="p">])</span>
+
+        <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx</span><span class="p">(</span><span class="n">subgraph</span><span class="p">,</span>
+                         <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span>
+                         <span class="c1"># font_size=24,</span>
+                         <span class="n">alpha</span><span class="o">=</span><span class="mf">.5</span><span class="p">,</span>
+                         <span class="n">width</span><span class="o">=</span><span class="mf">.25</span><span class="p">,</span>
+                         <span class="n">node_size</span><span class="o">=</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;sizes&quot;</span><span class="p">],</span>
+                         <span class="n">labels</span><span class="o">=</span><span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">],</span>
+                         <span class="n">pos</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+                         <span class="n">with_labels</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                         <span class="c1"># node_color=altitude,</span>
+                         <span class="c1"># cmap=plt.cm.autumn</span>
+                         <span class="p">)</span>
+
+        <span class="c1"># add labels</span>
+        <span class="k">for</span> <span class="n">node</span><span class="p">,</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="ow">in</span> <span class="n">pos</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">fs</span> <span class="o">=</span> <span class="mi">12</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;degrees&quot;</span><span class="p">][</span><span class="n">node</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">12</span><span class="p">:</span>
+                    <span class="n">fs</span> <span class="o">=</span> <span class="n">attributes</span><span class="p">[</span><span class="s2">&quot;degrees&quot;</span><span class="p">][</span><span class="n">node</span><span class="p">]</span>
+                <span class="n">text</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fs</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">o_formats</span><span class="p">:</span>
+            <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="si">}</span><span class="s2">map_network_</span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="s1">&#39;tight&#39;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="MapUtils"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.MapUtils">[docs]</a><span class="k">class</span> <span class="nc">MapUtils</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;The :class:`~bibliometa.graph.visualization.MapUtils` provides utilities for the</span>
+<span class="sd">    :class:`~bibliometa.graph.visualization.Map` class.</span>
+<span class="sd">     &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="MapUtils.read_shp"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.MapUtils.read_shp">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_shp</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;grey&quot;</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Read shapefile.</span>
+
+<span class="sd">        :param f: Path to shapefile</span>
+<span class="sd">        :type f: `str`</span>
+<span class="sd">        :param color: Color of shapefile background</span>
+<span class="sd">        :type color: `str`</span>
+<span class="sd">        :param verbose: Verbose parameter</span>
+<span class="sd">        :type verbose: `bool`</span>
+<span class="sd">        :return: Shapefile</span>
+<span class="sd">        :rtype: GeoDataFrame</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shp</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+            <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">15</span><span class="p">))</span>
+            <span class="n">shp</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">shp</span></div>
+
+<div class="viewcode-block" id="MapUtils.convert_to_gdf"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.visualization.MapUtils.convert_to_gdf">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">convert_to_gdf</span><span class="p">(</span><span class="n">csv_input</span><span class="p">,</span> <span class="n">crs</span><span class="p">,</span> <span class="n">csv_sep</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert long/lat to Point objects.</span>
+
+<span class="sd">        :param csv_input: Path to CSV input file with long/lat information</span>
+<span class="sd">        :type csv_input: `str`</span>
+<span class="sd">        :param crs: Coordinate Reference System</span>
+<span class="sd">        :type crs: `str`</span>
+<span class="sd">        :param csv_sep: CSV separator in input file</span>
+<span class="sd">        :type csv_sep: `str`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">orig_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">csv_input</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="n">csv_sep</span><span class="p">)</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">orig_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">geometry</span> <span class="o">=</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="n">xy</span><span class="p">)</span> <span class="k">for</span> <span class="n">xy</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s2">&quot;lng&quot;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s2">&quot;lat&quot;</span><span class="p">])]</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">GeoDataFrame</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">,</span> <span class="n">geometry</span><span class="o">=</span><span class="n">geometry</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully converted import data from </span><span class="si">{</span><span class="n">csv_input</span><span class="si">}</span><span class="s2"> to GeoDataFrame.&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Imported city data:</span><span class="se">\n</span><span class="si">{</span><span class="n">orig_df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GeoDataFrame:</span><span class="se">\n</span><span class="si">{</span><span class="n">df</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not convert import data from </span><span class="si">{</span><span class="n">csv_input</span><span class="si">}</span><span class="s2"> to GeoDataFrame. Exception: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright 2021, Andreas Lüschow.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
