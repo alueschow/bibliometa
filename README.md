@@ -5,6 +5,8 @@
 
 Bibliometa is a python library for manipulating, converting and analysing bibliographic metadata, with a focus on graph analysis.
 
+*Homepage*: https://bibliometa.readthedocs.io
+
 *Repository*: https://github.com/alueschow/bibliometa
 
 *Package*: https://pypi.org/project/bibliometa/
