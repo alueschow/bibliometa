@@ -148,6 +148,8 @@ class GraphCorpus:
 
             logger.debug(f"Corpus keys: {len(_corpus.keys())}")
 
+            progressbar.close()
+
             return _corpus
 
         def _create_original():
