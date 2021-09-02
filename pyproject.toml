@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bibliometa"
-version = "0.1.1"
+version = "0.1.2"
 description = "A package for manipulating, converting and analysing bibliographic metadata"
 authors = ["Andreas Lüschow <lueschow@sub.uni-goettingen.de>"]
 license = "MIT License"
