@@ -61,6 +61,21 @@ JSON_EDGELIST_CONVERSION_CONFIG_DEFAULT = {
 GRAPH_ANALYSIS_CONFIG_DEFAULT = {
     "i": None,  # input similarity file
     "o": None,  # path where output text file with graph analysis are stored; mandatory
+    "types": ["node_count",
+              "edge_count",
+              "component_count",
+              "max_component",
+              "avg_degree",
+              "degree_distribution",
+              "top_dc_nodes",
+              "degree_centrality_distribution",
+              "local_cluster_coefficient",
+              "density",
+              "diameter",
+              "average_shortest_path",
+              "global_clustering_coefficient",
+              "graph_clique_number",
+              "number_of_cliques"],  # types of graph analysis conducted; by default, all available analyses are used
     "img": None,  # path where output images are stored; mandatory
     "create_graphml": False,  # if GraphML file should be created when creating graph from similarity file
     "graphml": None,  # path where GraphML input/output files are stored; mandatory
@@ -86,15 +101,24 @@ GRAPH_VISUALISATION_MAP_CONFIG_DEFAULT = {
     "o": None,  # output folder for image files
     "o_formats": ("pdf", "svg"),  # output formats that will be created
     "degrees": None,  # output folder where node degree information is saved
+    "types": None,  # types of visualization; may be "scatter", "cities", "degrees", and/or "map"
     "shapefile": "../data/shapefiles/DEU_adm1/DEU_adm1.shp",  # input shapefile
     "shapefile_color": "grey",  # shapefile color
     "degree_node_color": "black",  # color of nodes in degree images
     "coordinates": "../data/german_cities.csv",  # CSV file with coordinates information
     "coordinates_sep": ",",  # CSV separator in coordinates input file
-    "geo_col": "city",  # column with city information
+    "keys_labels": ("id", "city"),  # ID and label column in coordinates GeoDataFrame
     "crs": "epsg:4326",  # Coordinate Reference System used
+    "map_extent": "global",  # may be "global" or a list of 4 values
+    "components": True,  # whether all components are used, otherwise only largest
+    "all_nodes": True,  # whether also nodes without edges are used
+    "graph_corpus": None,  # path to graph corpus, mandatory if all_nodes == True
+    "singletons": False,  # if only nodes without edges are used; only used if all_nodes == True
     "name": None,  # identifier for a visualization run that is appended to output images filenames; mandatory
     "figsize": (55, 55),  # size of output figures
+    "fontsize": 12,  # font size in figures
+    "max_fontsize": 24,
+    "edge_width": .25,
     "log": None,  # path to log file
     "log_level_std": "INFO",  # log severity level on standard output
     "log_level_file": "DEBUG",  # log severity level in log file
