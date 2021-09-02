@@ -36,14 +36,6 @@ bibliometa.graph.utils module
    :undoc-members:
    :show-inheritance:
 
-bibliometa.graph.visualization module
--------------------------------------
-
-.. automodule:: bibliometa.graph.visualization
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 Module contents
 ---------------
 
