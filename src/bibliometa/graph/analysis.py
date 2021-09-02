@@ -85,130 +85,165 @@ class GraphAnalysis(BibliometaConfiguration):
             self.config.o, suffix=self.config.name
         )
 
-        with tqdm(total=9) as progressbar:
+        with tqdm(total=len(self.config.types)) as progressbar:
             # Calculate basic metrics
-            nodes = self._node_count()
-            edges = self._edge_count()
-            components = self._component_count()
-            max_component = self._max_component()
-            avg_degree = self._avg_degree()
+            if "node_count" in self.config.types:
+                nodes = self._node_count()
+                nodes_str = f"Nodes: {nodes}"
+                self._results.append(nodes_str)
+                logger.info(nodes_str)
 
-            # Get basic metrics
-            nodes_str = f"Nodes: {nodes}"
-            self._results.append(nodes_str)
-            logger.info(nodes_str)
-            edges_str = f"Edges: {edges}"
-            self._results.append(edges_str)
-            logger.info(edges_str)
-            components_str = f"Components: {components}"
-            self._results.append(components_str)
-            logger.info(components_str)
-            max_component_str = f"Size of largest component: {max_component}"
-            self._results.append(max_component_str)
-            logger.info(max_component_str)
-            avg_degree_str = f"Average Degree: {avg_degree}"
-            self._results.append(avg_degree_str)
-            logger.info(avg_degree_str)
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+            if "edge_count" in self.config.types:
+                edges = self._edge_count()
+                edges_str = f"Edges: {edges}"
+                self._results.append(edges_str)
+                logger.info(edges_str)
+
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
+
+            if "component_count" in self.config.types:
+                components = self._component_count()
+                components_str = f"Components: {components}"
+                self._results.append(components_str)
+                logger.info(components_str)
+
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
+
+            if "max_component" in self.config.types:
+                max_component = self._max_component()
+                max_component_str = f"Size of largest component: {max_component}"
+                self._results.append(max_component_str)
+                logger.info(max_component_str)
+
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
+
+            if "avg_degree" in self.config.types:
+                avg_degree = self._avg_degree()
+                avg_degree_str = f"Average Degree: {avg_degree}"
+                self._results.append(avg_degree_str)
+                logger.info(avg_degree_str)
+
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Plot degree distribution
-            logger.info("Start plotting degree distributions.")
-            self._degree_distribution(weight='weight')
-            logger.info("Finished plotting degree distributions.")
+            if "degree_distribution" in self.config.types:
+                logger.info("Start plotting degree distributions.")
+                self._degree_distribution(weight='weight')
+                logger.info("Finished plotting degree distributions.")
+
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Top degree centrality nodes
-            logger.info("Getting top Degree Centrality nodes.")
-            self._top_dc_nodes()
-            # Degree Centrality distributions
-            logger.info("Calculating Degree Centrality distributions.")
-            dc_values = self._degree_centrality()
-            avg_dc_str = f"Average degree centrality: {np.mean(list(dc_values))}"
-            self._results.append(avg_dc_str)
-            logger.info(avg_dc_str)
-            min_dc_str = f"Minimum degree centrality: {np.min(list(dc_values))}"
-            self._results.append(min_dc_str)
-            logger.info(min_dc_str)
-            max_dc_str = f"Maximum degree centrality: {np.max(list(dc_values))}"
-            self._results.append(max_dc_str)
-            logger.info(max_dc_str)
-            stdev_dc_str = f"Stdev degree centrality: {np.std(list(dc_values))}"
-            self._results.append(stdev_dc_str)
-            logger.info(stdev_dc_str)
+            if "top_dc_nodes" in self.config.types:
+                logger.info("Getting top Degree Centrality nodes.")
+                self._top_dc_nodes()
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+            # Degree Centrality distributions
+            if "degree_centrality_distribution" in self.config.types:
+                logger.info("Calculating Degree Centrality distributions.")
+                dc_values = self._degree_centrality()
+                avg_dc_str = f"Average degree centrality: {np.mean(list(dc_values))}"
+                self._results.append(avg_dc_str)
+                logger.info(avg_dc_str)
+                min_dc_str = f"Minimum degree centrality: {np.min(list(dc_values))}"
+                self._results.append(min_dc_str)
+                logger.info(min_dc_str)
+                max_dc_str = f"Maximum degree centrality: {np.max(list(dc_values))}"
+                self._results.append(max_dc_str)
+                logger.info(max_dc_str)
+                stdev_dc_str = f"Stdev degree centrality: {np.std(list(dc_values))}"
+                self._results.append(stdev_dc_str)
+                logger.info(stdev_dc_str)
+
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Local cluster coefficient
-            logger.info("Calculating local cluster coefficients.")
-            if self.config.weighted:
-                lcc_values = self._local_cluster_coefficient(weight='weight')
-            else:
-                lcc_values = self._local_cluster_coefficient()
-            avg_lcc_str = f"Average local cluster coefficient: {np.mean(list(lcc_values))}"
-            self._results.append(avg_lcc_str)
-            logger.info(avg_lcc_str)
-            min_lcc_str = f"Minimum local cluster coefficient: {np.min(list(lcc_values))}"
-            self._results.append(min_lcc_str)
-            logger.info(min_lcc_str)
-            max_lcc_str = f"Maximum local cluster coefficient: {np.max(list(lcc_values))}"
-            self._results.append(max_lcc_str)
-            logger.info(max_lcc_str)
-            stdev_lcc_str = f"Stdev local cluster coefficient: {np.std(list(lcc_values))}"
-            self._results.append(stdev_lcc_str)
-            logger.info(stdev_lcc_str)
+            if "local_cluster_coefficient" in self.config.types:
+                logger.info("Calculating local cluster coefficients.")
+                if self.config.weighted:
+                    lcc_values = self._local_cluster_coefficient(weight='weight')
+                else:
+                    lcc_values = self._local_cluster_coefficient()
+                avg_lcc_str = f"Average local cluster coefficient: {np.mean(list(lcc_values))}"
+                self._results.append(avg_lcc_str)
+                logger.info(avg_lcc_str)
+                min_lcc_str = f"Minimum local cluster coefficient: {np.min(list(lcc_values))}"
+                self._results.append(min_lcc_str)
+                logger.info(min_lcc_str)
+                max_lcc_str = f"Maximum local cluster coefficient: {np.max(list(lcc_values))}"
+                self._results.append(max_lcc_str)
+                logger.info(max_lcc_str)
+                stdev_lcc_str = f"Stdev local cluster coefficient: {np.std(list(lcc_values))}"
+                self._results.append(stdev_lcc_str)
+                logger.info(stdev_lcc_str)
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Density
-            density_str = f"Density: {self._density()}"
-            self._results.append(density_str)
-            logger.info(density_str)
+            if "density" in self.config.types:
+                density_str = f"Density: {self._density()}"
+                self._results.append(density_str)
+                logger.info(density_str)
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Diameter
-            diameter_str = f"Diameter: {self._diameter()}"
-            self._results.append(diameter_str)
-            logger.info(diameter_str)
+            if "diameter" in self.config.types:
+                diameter_str = f"Diameter: {self._diameter()}"
+                self._results.append(diameter_str)
+                logger.info(diameter_str)
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Average shortest path
-            avg_shortest_path_str = f"Average shortest path: {self._avg_shortest_path()}"
-            self._results.append(avg_shortest_path_str)
-            logger.info(avg_shortest_path_str)
+            if "average_shortest_path" in self.config.types:
+                avg_shortest_path_str = f"Average shortest path: {self._avg_shortest_path()}"
+                self._results.append(avg_shortest_path_str)
+                logger.info(avg_shortest_path_str)
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Global clustering coefficient
-            global_cc_str = f"Global clustering coefficient: {self._global_cluster_coefficient()}"
-            self._results.append(global_cc_str)
-            logger.info(global_cc_str)
+            if "global_clustering_coefficient" in self.config.types:
+                global_cc_str = f"Global clustering coefficient: {self._global_cluster_coefficient()}"
+                self._results.append(global_cc_str)
+                logger.info(global_cc_str)
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Graph clique number
-            clique_number_str = f"Graph clique number: {self._clique_number()}"
-            self._results.append(clique_number_str)
-            logger.info(clique_number_str)
+            if "graph_clique_number" in self.config.types:
+                clique_number_str = f"Graph clique number: {self._clique_number()}"
+                self._results.append(clique_number_str)
+                logger.info(clique_number_str)
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
             # Graph number of cliques
-            nr_of_cliques_str = f"Number of cliques: {self._nr_of_cliques()}"
-            self._results.append(nr_of_cliques_str)
-            logger.info(nr_of_cliques_str)
+            if "number_of_cliques" in self.config.types:
+                nr_of_cliques_str = f"Number of cliques: {self._nr_of_cliques()}"
+                self._results.append(nr_of_cliques_str)
+                logger.info(nr_of_cliques_str)
 
-            save_file(filename + suffix + ext, self._results)
-            progressbar.update()
+                save_file(filename + suffix + ext, self._results)
+                progressbar.update()
 
     def _node_count(self):
         """Return node count.
