@@ -434,17 +434,40 @@ a and b &gt;= t</p></li>
 </div>
 <div class="section" id="module-bibliometa.graph.utils">
 <span id="bibliometa-graph-utils-module"></span><h2>bibliometa.graph.utils module<a class="headerlink" href="#module-bibliometa.graph.utils" title="Permalink to this headline">¶</a></h2>
-<p>This module provides utility classes and functions for graphs.</p>
+<p>This module provides utility functions for graphs.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="bibliometa.graph.utils.add_nodes_from_graph_corpus">
+<span class="sig-prename descclassname"><span class="pre">bibliometa.graph.utils.</span></span><span class="sig-name descname"><span class="pre">add_nodes_from_graph_corpus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corpus</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">singletons</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'utf-8'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/graph/utils.html#add_nodes_from_graph_corpus"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.graph.utils.add_nodes_from_graph_corpus" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add nodes from a graph corpus file to a graph if not yet existent.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>graph</strong> (<cite>nx.Graph</cite>) – Graph object</p></li>
+<li><p><strong>corpus</strong> (<cite>str</cite>) – Path to graph corpus file</p></li>
+<li><p><strong>singletons</strong> (<cite>bool</cite>) – If <em>only</em> those nodes with no edges will be returned</p></li>
+<li><p><strong>encoding</strong> (<cite>str</cite>) – File encoding</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Updated Graph object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><cite>nx.Graph</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="bibliometa.graph.utils.create_pos">
-<span class="sig-prename descclassname"><span class="pre">bibliometa.graph.utils.</span></span><span class="sig-name descname"><span class="pre">create_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">geo_col</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/graph/utils.html#create_pos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.graph.utils.create_pos" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">bibliometa.graph.utils.</span></span><span class="sig-name descname"><span class="pre">create_pos</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">graph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys_labels</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extent</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/graph/utils.html#create_pos"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.graph.utils.create_pos" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create dictionary with node positions.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>graph</strong> (<cite>networkx.Graph</cite>) – Graph object</p></li>
 <li><p><strong>df</strong> (<cite>pandas.DataFrame</cite>) – DataFrame with geographical information</p></li>
-<li><p><strong>geo_col</strong> (<cite>str</cite>) – Column in DataFrame</p></li>
+<li><p><strong>keys_labels</strong> (<cite>str</cite>) – Column in DataFrame</p></li>
+<li><p><strong>extent</strong> (<cite>list</cite>) – Extent of map</p></li>
 <li><p><strong>verbose</strong> (<cite>bool</cite>) – Verbose parameter</p></li>
 </ul>
 </dd>
@@ -718,7 +741,7 @@ Otherwise, only the configuration parameters given in args are returned.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="bibliometa.graph.visualization.Plotting.graph_on_map">
-<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">graph_on_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgraph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/graph/visualization.html#Plotting.graph_on_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.graph.visualization.Plotting.graph_on_map" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span> </em><span class="sig-name descname"><span class="pre">graph_on_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shapes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgraph</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/bibliometa/graph/visualization.html#Plotting.graph_on_map"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bibliometa.graph.visualization.Plotting.graph_on_map" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plot graph on a map.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -727,6 +750,7 @@ Otherwise, only the configuration parameters given in args are returned.</p>
 <li><p><strong>subgraph</strong> (<cite>networkx.Graph</cite>) – Largest component of graph</p></li>
 <li><p><strong>attributes</strong> (<cite>dict</cite>) – Dictionary of graph degrees, labels and sizes</p></li>
 <li><p><strong>pos</strong> (<cite>dict</cite>) – Dictionary of node positions</p></li>
+<li><p><strong>df</strong> (<cite>pandas.DataFrame</cite>) – DataFrame with coordinates</p></li>
 <li><p><strong>config</strong> (<cite>bibliometa.configuration.Config</cite>) – Configuration object</p></li>
 </ul>
 </dd>

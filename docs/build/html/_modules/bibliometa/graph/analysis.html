@@ -85,8 +85,11 @@
               
             
             
-              <!-- Local TOC -->
-              <div class="local-toc"></div>
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../modules.html">bibliometa</a></li>
+</ul>
+
             
           
         </div>
@@ -179,18 +182,18 @@
 <span class="sd">    It extends the abstract :class:`~bibliometa.configuration.BibliometaConfiguration` class.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GraphAnalysis.__init__"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct a new :class:`~bibliometa.graph.analysis.GraphAnalysis`.</span>
 
-<span class="sd">        :param kwargs: Arbitrary keyword arguments that are used as configuration keys and values.</span>
+<span class="sd">        :param **kwargs: Arbitrary keyword arguments that are used as configuration keys and values.</span>
 <span class="sd">            For example, `verbose=True` will make available a configuration key `verbose` with the value</span>
 <span class="sd">            `True` (i.e., `self.config.verbose` will then return `True`). Configuration can be set during</span>
 <span class="sd">            initialization as well as after constructing a class instance by calling the `set_config` method</span>
 <span class="sd">            on a :class:`~bibliometa.graph.analysis.GraphAnalysis` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">GRAPH_ANALYSIS_CONFIG_DEFAULT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">GRAPH_ANALYSIS_CONFIG_DEFAULT</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GraphAnalysis._update_config"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._update_config">[docs]</a>    <span class="k">def</span> <span class="nf">_update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_update_config</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update configuration with class-specific values and check for configuration correctness.</span>
 
 <span class="sd">        :raise ValueError: If no `self.config.sim_functions` are given.</span>
@@ -218,7 +221,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_results</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Load graph from GraphML file, if existent; otherwise create GraphML file from similarity file</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">load_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">g</span> <span class="o">=</span> <span class="n">load_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
 
 <div class="viewcode-block" id="GraphAnalysis.start"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis.start">[docs]</a>    <span class="k">def</span> <span class="nf">start</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Start the analysis.&quot;&quot;&quot;</span>
@@ -238,156 +241,191 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span>
         <span class="p">)</span>
 
-        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">9</span><span class="p">)</span> <span class="k">as</span> <span class="n">progressbar</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">))</span> <span class="k">as</span> <span class="n">progressbar</span><span class="p">:</span>
             <span class="c1"># Calculate basic metrics</span>
-            <span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_count</span><span class="p">()</span>
-            <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_count</span><span class="p">()</span>
-            <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_component_count</span><span class="p">()</span>
-            <span class="n">max_component</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_component</span><span class="p">()</span>
-            <span class="n">avg_degree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_avg_degree</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;node_count&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">nodes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_node_count</span><span class="p">()</span>
+                <span class="n">nodes_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Nodes: </span><span class="si">{</span><span class="n">nodes</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nodes_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">nodes_str</span><span class="p">)</span>
 
-            <span class="c1"># Get basic metrics</span>
-            <span class="n">nodes_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Nodes: </span><span class="si">{</span><span class="n">nodes</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nodes_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">nodes_str</span><span class="p">)</span>
-            <span class="n">edges_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Edges: </span><span class="si">{</span><span class="n">edges</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edges_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">edges_str</span><span class="p">)</span>
-            <span class="n">components_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Components: </span><span class="si">{</span><span class="n">components</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">components_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">components_str</span><span class="p">)</span>
-            <span class="n">max_component_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Size of largest component: </span><span class="si">{</span><span class="n">max_component</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_component_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">max_component_str</span><span class="p">)</span>
-            <span class="n">avg_degree_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Average Degree: </span><span class="si">{</span><span class="n">avg_degree</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_degree_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">avg_degree_str</span><span class="p">)</span>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="k">if</span> <span class="s2">&quot;edge_count&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">edges</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_edge_count</span><span class="p">()</span>
+                <span class="n">edges_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Edges: </span><span class="si">{</span><span class="n">edges</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">edges_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">edges_str</span><span class="p">)</span>
+
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="s2">&quot;component_count&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_component_count</span><span class="p">()</span>
+                <span class="n">components_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Components: </span><span class="si">{</span><span class="n">components</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">components_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">components_str</span><span class="p">)</span>
+
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="s2">&quot;max_component&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">max_component</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_component</span><span class="p">()</span>
+                <span class="n">max_component_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Size of largest component: </span><span class="si">{</span><span class="n">max_component</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_component_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">max_component_str</span><span class="p">)</span>
+
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="s2">&quot;avg_degree&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">avg_degree</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_avg_degree</span><span class="p">()</span>
+                <span class="n">avg_degree_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Average Degree: </span><span class="si">{</span><span class="n">avg_degree</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_degree_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">avg_degree_str</span><span class="p">)</span>
+
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Plot degree distribution</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start plotting degree distributions.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_degree_distribution</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished plotting degree distributions.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;degree_distribution&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Start plotting degree distributions.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_degree_distribution</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished plotting degree distributions.&quot;</span><span class="p">)</span>
+
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Top degree centrality nodes</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting top Degree Centrality nodes.&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_top_dc_nodes</span><span class="p">()</span>
-            <span class="c1"># Degree Centrality distributions</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating Degree Centrality distributions.&quot;</span><span class="p">)</span>
-            <span class="n">dc_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_degree_centrality</span><span class="p">()</span>
-            <span class="n">avg_dc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Average degree centrality: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_dc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">avg_dc_str</span><span class="p">)</span>
-            <span class="n">min_dc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Minimum degree centrality: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_dc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">min_dc_str</span><span class="p">)</span>
-            <span class="n">max_dc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Maximum degree centrality: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_dc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">max_dc_str</span><span class="p">)</span>
-            <span class="n">stdev_dc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Stdev degree centrality: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stdev_dc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">stdev_dc_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;top_dc_nodes&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Getting top Degree Centrality nodes.&quot;</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_top_dc_nodes</span><span class="p">()</span>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+            <span class="c1"># Degree Centrality distributions</span>
+            <span class="k">if</span> <span class="s2">&quot;degree_centrality_distribution&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating Degree Centrality distributions.&quot;</span><span class="p">)</span>
+                <span class="n">dc_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_degree_centrality</span><span class="p">()</span>
+                <span class="n">avg_dc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Average degree centrality: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_dc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">avg_dc_str</span><span class="p">)</span>
+                <span class="n">min_dc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Minimum degree centrality: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_dc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">min_dc_str</span><span class="p">)</span>
+                <span class="n">max_dc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Maximum degree centrality: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_dc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">max_dc_str</span><span class="p">)</span>
+                <span class="n">stdev_dc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Stdev degree centrality: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">dc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stdev_dc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">stdev_dc_str</span><span class="p">)</span>
+
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Local cluster coefficient</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating local cluster coefficients.&quot;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
-                <span class="n">lcc_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_cluster_coefficient</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">lcc_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_cluster_coefficient</span><span class="p">()</span>
-            <span class="n">avg_lcc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Average local cluster coefficient: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lcc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_lcc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">avg_lcc_str</span><span class="p">)</span>
-            <span class="n">min_lcc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Minimum local cluster coefficient: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lcc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_lcc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">min_lcc_str</span><span class="p">)</span>
-            <span class="n">max_lcc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Maximum local cluster coefficient: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lcc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_lcc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">max_lcc_str</span><span class="p">)</span>
-            <span class="n">stdev_lcc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Stdev local cluster coefficient: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lcc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stdev_lcc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">stdev_lcc_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;local_cluster_coefficient&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Calculating local cluster coefficients.&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">weighted</span><span class="p">:</span>
+                    <span class="n">lcc_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_cluster_coefficient</span><span class="p">(</span><span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lcc_values</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_cluster_coefficient</span><span class="p">()</span>
+                <span class="n">avg_lcc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Average local cluster coefficient: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lcc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_lcc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">avg_lcc_str</span><span class="p">)</span>
+                <span class="n">min_lcc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Minimum local cluster coefficient: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lcc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">min_lcc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">min_lcc_str</span><span class="p">)</span>
+                <span class="n">max_lcc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Maximum local cluster coefficient: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lcc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_lcc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">max_lcc_str</span><span class="p">)</span>
+                <span class="n">stdev_lcc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Stdev local cluster coefficient: </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">lcc_values</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stdev_lcc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">stdev_lcc_str</span><span class="p">)</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Density</span>
-            <span class="n">density_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Density: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">density_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">density_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;density&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">density_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Density: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_density</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">density_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">density_str</span><span class="p">)</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Diameter</span>
-            <span class="n">diameter_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Diameter: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_diameter</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diameter_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">diameter_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;diameter&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">diameter_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Diameter: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_diameter</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">diameter_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">diameter_str</span><span class="p">)</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Average shortest path</span>
-            <span class="n">avg_shortest_path_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Average shortest path: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_avg_shortest_path</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_shortest_path_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">avg_shortest_path_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;average_shortest_path&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">avg_shortest_path_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Average shortest path: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_avg_shortest_path</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">avg_shortest_path_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">avg_shortest_path_str</span><span class="p">)</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Global clustering coefficient</span>
-            <span class="n">global_cc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Global clustering coefficient: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_global_cluster_coefficient</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">global_cc_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">global_cc_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;global_clustering_coefficient&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">global_cc_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Global clustering coefficient: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_global_cluster_coefficient</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">global_cc_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">global_cc_str</span><span class="p">)</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Graph clique number</span>
-            <span class="n">clique_number_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Graph clique number: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_clique_number</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clique_number_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">clique_number_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;graph_clique_number&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">clique_number_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Graph clique number: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_clique_number</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clique_number_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">clique_number_str</span><span class="p">)</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
 
             <span class="c1"># Graph number of cliques</span>
-            <span class="n">nr_of_cliques_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Number of cliques: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_nr_of_cliques</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nr_of_cliques_str</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">nr_of_cliques_str</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;number_of_cliques&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">types</span><span class="p">:</span>
+                <span class="n">nr_of_cliques_str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Number of cliques: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_nr_of_cliques</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nr_of_cliques_str</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">nr_of_cliques_str</span><span class="p">)</span>
 
-            <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
-            <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
+                <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
+                <span class="n">progressbar</span><span class="o">.</span><span class="n">update</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="GraphAnalysis._node_count"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._node_count">[docs]</a>    <span class="k">def</span> <span class="nf">_node_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_node_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return node count.</span>
 
 <span class="sd">        :return: Node count</span>
 <span class="sd">        :rtype: `int`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">nodes</span><span class="p">))</span>
 
-<div class="viewcode-block" id="GraphAnalysis._edge_count"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._edge_count">[docs]</a>    <span class="k">def</span> <span class="nf">_edge_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_edge_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return edge count.</span>
 
 <span class="sd">        :return: Edge count</span>
 <span class="sd">        :rtype: `int`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">edges</span><span class="p">))</span>
 
-<div class="viewcode-block" id="GraphAnalysis._component_count"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._component_count">[docs]</a>    <span class="k">def</span> <span class="nf">_component_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_component_count</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return component count.</span>
 
 <span class="sd">        :return: Component count</span>
 <span class="sd">        :rtype: `int`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)))</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)))</span>
 
-<div class="viewcode-block" id="GraphAnalysis._max_component"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._max_component">[docs]</a>    <span class="k">def</span> <span class="nf">_max_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_component</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_max_component</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">return_component</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return largest component size or largest component.</span>
 
 <span class="sd">        :param return_component: Whether component should be returned instead of only the size</span>
@@ -398,17 +436,17 @@
         <span class="k">if</span> <span class="n">return_component</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)))</span></div>
+            <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">nx</span><span class="o">.</span><span class="n">connected_components</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="nb">len</span><span class="p">)))</span>
 
-<div class="viewcode-block" id="GraphAnalysis._avg_degree"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._avg_degree">[docs]</a>    <span class="k">def</span> <span class="nf">_avg_degree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_avg_degree</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return average node degree.</span>
 
 <span class="sd">        :return: Average node degree</span>
 <span class="sd">        :rtype: `float`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">order</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">size</span><span class="p">())</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">order</span><span class="p">()</span>
 
-<div class="viewcode-block" id="GraphAnalysis._degree_distribution"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._degree_distribution">[docs]</a>    <span class="k">def</span> <span class="nf">_degree_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_degree_distribution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate, plot and save degree distributions.</span>
 
 <span class="sd">        :param weight: Edge attribute that contains weight information</span>
@@ -494,9 +532,9 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">verbose</span><span class="p">:</span>
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<div class="viewcode-block" id="GraphAnalysis._top_dc_nodes"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._top_dc_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">_top_dc_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_top_dc_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="mi">5</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;&quot;Get top k Degree Centrality nodes.</span>
 
 <span class="sd">        :param k: Number of nodes that will be collected</span>
@@ -518,9 +556,9 @@
         <span class="n">filename</span><span class="p">,</span> <span class="n">suffix</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">MainUtils</span><span class="o">.</span><span class="n">get_file_info</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">o</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">name</span>
         <span class="p">)</span>
-        <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span></div>
+        <span class="n">save_file</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="n">suffix</span> <span class="o">+</span> <span class="n">ext</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_results</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GraphAnalysis._degree_centrality"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._degree_centrality">[docs]</a>    <span class="k">def</span> <span class="nf">_degree_centrality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_degree_centrality</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate, plot and save Degree Centrality distributions.</span>
 
 <span class="sd">        :return: Degree Centralities and their occurrence</span>
@@ -543,9 +581,9 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">dc</span></div>
+        <span class="k">return</span> <span class="n">dc</span>
 
-<div class="viewcode-block" id="GraphAnalysis._local_cluster_coefficient"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._local_cluster_coefficient">[docs]</a>    <span class="k">def</span> <span class="nf">_local_cluster_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_local_cluster_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Calculate, plot and save local cluster coefficients.</span>
 
 <span class="sd">        :param weight: Edge attribute that contains weight information</span>
@@ -571,17 +609,17 @@
             <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-        <span class="k">return</span> <span class="n">cc</span></div>
+        <span class="k">return</span> <span class="n">cc</span>
 
-<div class="viewcode-block" id="GraphAnalysis._density"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._density">[docs]</a>    <span class="k">def</span> <span class="nf">_density</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_density</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return graph density.</span>
 
 <span class="sd">        :return: Graph density</span>
 <span class="sd">        :rtype: `float`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">density</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GraphAnalysis._diameter"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._diameter">[docs]</a>    <span class="k">def</span> <span class="nf">_diameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_diameter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return graph diameter.</span>
 
 <span class="sd">        :return: Graph diameter</span>
@@ -590,9 +628,9 @@
         <span class="k">if</span> <span class="n">nx</span><span class="o">.</span><span class="n">is_connected</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">diameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">diameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_component</span><span class="p">(</span><span class="n">return_component</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span></div>
+            <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">algorithms</span><span class="o">.</span><span class="n">diameter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_component</span><span class="p">(</span><span class="n">return_component</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
 
-<div class="viewcode-block" id="GraphAnalysis._avg_shortest_path"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._avg_shortest_path">[docs]</a>    <span class="k">def</span> <span class="nf">_avg_shortest_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_avg_shortest_path</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return average shortest path.</span>
 
 <span class="sd">        :return: Average shortest path</span>
@@ -602,31 +640,31 @@
             <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">average_shortest_path_length</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">average_shortest_path_length</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="o">.</span><span class="n">subgraph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_max_component</span><span class="p">(</span><span class="n">return_component</span><span class="o">=</span><span class="kc">True</span><span class="p">)),</span>
-                                                   <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span></div>
+                                                   <span class="n">weight</span><span class="o">=</span><span class="s1">&#39;weight&#39;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GraphAnalysis._global_cluster_coefficient"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._global_cluster_coefficient">[docs]</a>    <span class="k">def</span> <span class="nf">_global_cluster_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_global_cluster_coefficient</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return global cluster coefficient.</span>
 
 <span class="sd">        :return: Global cluster coefficient</span>
 <span class="sd">        :rtype: `float`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">average_clustering</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">average_clustering</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GraphAnalysis._clique_number"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._clique_number">[docs]</a>    <span class="k">def</span> <span class="nf">_clique_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_clique_number</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return clique number (i.e., size of largest clique).</span>
 
 <span class="sd">        :return: Size of largest clique</span>
 <span class="sd">        :rtype: `int`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">graph_clique_number</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">graph_clique_number</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span>
 
-<div class="viewcode-block" id="GraphAnalysis._nr_of_cliques"><a class="viewcode-back" href="../../../bibliometa.graph.html#bibliometa.graph.analysis.GraphAnalysis._nr_of_cliques">[docs]</a>    <span class="k">def</span> <span class="nf">_nr_of_cliques</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_nr_of_cliques</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return number of cliques.</span>
 
 <span class="sd">        :return: Number of cliques</span>
 <span class="sd">        :rtype: `int`</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">graph_number_of_cliques</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">graph_number_of_cliques</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">g</span><span class="p">)</span></div>
 </pre></div>
 
            </div>
