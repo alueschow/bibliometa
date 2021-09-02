@@ -151,6 +151,37 @@ def get_nodes(graph, config, encoding=_ENCODING):
     return nodes
 
 
+def add_nodes_from_graph_corpus(graph, corpus, singletons=False, encoding=_ENCODING):
+    """Add nodes from a graph corpus file to a graph if not yet existent.
+
+    :param graph: Graph object
+    :type graph: `nx.Graph`
+    :param corpus: Path to graph corpus file
+    :type corpus: `str`
+    :param singletons: If *only* those nodes with no edges will be returned
+    :type singletons: `bool`
+    :param encoding: File encoding
+    :type encoding: `str`
+    :return: Updated Graph object
+    :rtype: `nx.Graph`
+    """
+    with open(corpus, "r", encoding=encoding) as f:
+        data = json.load(f)
+
+    if singletons:
+        g = nx.Graph()
+        for k in data.keys():
+            if k not in graph.nodes:
+                g.add_node(k, size=len(data[k]))
+        return g
+    else:
+        for k in data.keys():
+            if k not in graph.nodes:
+                graph.add_node(k, size=len(data[k]))
+
+        return graph
+
+
 def update_graph(graph, df, col):
     """Remove nodes from graph that do not appear in column col in DataFrame df.
 
@@ -217,36 +248,52 @@ def get_graph_attributes(graph):
     :rtype: `dict`
     """
     degrees = nx.degree(graph)
-    labels = {n: n if degrees[n] >= 0 else '' for n in graph.nodes}
-    sizes = [10 * degrees[n] for n in graph.nodes]
+
+    # set default node size
+    for n in graph.nodes:
+        if "size" not in graph.nodes[n].keys():
+            graph.nodes[n]["size"] = 1
+
+    labels = {n: n for n in graph.nodes}
+    sizes = [10 * degrees[n] if degrees[n] > 0 else graph.nodes[n]["size"] for n in graph.nodes]
 
     return {"degrees": degrees,
             "labels": labels,
             "sizes": sizes}
 
 
-def create_pos(graph, df, geo_col, verbose):
+def create_pos(graph, df, keys_labels, extent, verbose):
     """Create dictionary with node positions.
 
     :param graph: Graph object
     :type graph: `networkx.Graph`
     :param df: DataFrame with geographical information
     :type df: `pandas.DataFrame`
-    :param geo_col: Column in DataFrame
-    :type geo_col: `str`
+    :param keys_labels: Column in DataFrame
+    :type keys_labels: `str`
+    :param extent: Extent of map
+    :type extent: `list`
     :param verbose: Verbose parameter
     :type verbose: `bool`
     :return: Dictionary of positions
     :rtype: `dict`
     """
     pos = {}
+    remove = []
+
     for n in graph.nodes:
-        lat = df[df[geo_col] == n]["lat"].to_string(index=False)
-        lng = df[df[geo_col] == n]["lng"].to_string(index=False)
-        pos[n] = (float(lng), float(lat))
+        lat = df[df[keys_labels] == n]["lat"].to_string(index=False)
+        lng = df[df[keys_labels] == n]["lng"].to_string(index=False)
+        if isinstance(extent, list):
+            if extent[0] < float(lng) < extent[1] and extent[2] < float(lat) < extent[3]:
+                pos[n] = (float(lng), float(lat))
+            else:
+                remove.append(n)
+        else:
+            pos[n] = (float(lng), float(lat))
 
     logger.debug(f"Positions: {pos}")
     if verbose:
         print(pos)
 
-    return pos
+    return pos, remove

@@ -20,7 +20,7 @@ from shapely.geometry import Point
 from bibliometa.config import LOGGING_FORMAT, GRAPH_VISUALISATION_MAP_CONFIG_DEFAULT
 from bibliometa.configuration import BibliometaConfiguration
 from bibliometa.graph.utils import load_graph, update_graph, get_nodes, get_subgraph, \
-    get_graph_attributes, create_pos
+    get_graph_attributes, create_pos, add_nodes_from_graph_corpus
 
 
 class Map(BibliometaConfiguration):
@@ -37,8 +37,6 @@ class Map(BibliometaConfiguration):
         self._shp = MapUtils.read_shp(self.config.shapefile, self.config.shapefile_color, self.config.verbose)
         self._shapes = list(shpreader.Reader(self.config.shapefile).geometries())
 
-        # TODO: not all cities in the CT are represented in this table.
-        #  Take the longitude/latitude from the CT instead?
         self._df = MapUtils.convert_to_gdf(self.config.coordinates, self.config.crs, self.config.coordinates_sep)
 
         self.graph = load_graph(self.config, reload=False)
@@ -63,28 +61,50 @@ class Map(BibliometaConfiguration):
         self._update_config()
 
         # plot all cities from city file as scatter plot
-        logger.info("Creating scatterplot.")
-        Plotting.scatter(self._df, self.config)
+        if "scatter" in self.config.types:
+            logger.info("Creating scatterplot.")
+            Plotting.scatter(self._df, self.config)
 
         # plot all cities from city file on map
-        logger.info("Plotting all cities.")
-        Plotting.cities(self._df, self._shp, self.config)
+        if "cities" in self.config.types:
+            logger.info("Plotting all cities.")
+            Plotting.cities(self._df, self._shp, self.config)
 
         # plot nodes on map
-        logger.info("Plotting node degrees.")
-        Plotting.degrees(self._df, self._shp, self._nodes, self.config)
+        if "degrees" in self.config.types:
+            logger.info("Plotting node degrees.")
+            Plotting.degrees(self._df, self._shp, self._nodes, self.config)
+
+        # add nodes with degree == 0 if desired
+        if self.config.all_nodes:
+            self.graph = add_nodes_from_graph_corpus(self.graph,
+                                                     self.config.graph_corpus,
+                                                     self.config.singletons,
+                                                     encoding=self.config.encoding)
 
         # remove unneeded nodes from the graph
-        update_graph(self.graph, self._df, self.config.geo_col)
+        update_graph(self.graph, self._df, self.config.keys_labels[0])
 
         # get largest component as subgraph and plot on map
-        logger.info("Plotting network on map.")
-        subgraph = get_subgraph(self.graph)
-        Plotting.graph_on_map(self._shapes,
-                              subgraph,
-                              get_graph_attributes(subgraph),
-                              create_pos(self.graph, self._df, self.config.geo_col, self.config.verbose),
-                              self.config)
+        if "map" in self.config.types:
+            logger.info("Plotting network on map.")
+            if not self.config.components:
+                subgraph = get_subgraph(self.graph)
+            else:
+                subgraph = self.graph
+            pos, remove = create_pos(subgraph,
+                                     self._df,
+                                     self.config.keys_labels[0],
+                                     self.config.map_extent,
+                                     self.config.verbose)
+            subgraph.remove_nodes_from(remove)
+            attributes = get_graph_attributes(subgraph)
+            Plotting.graph_on_map(self._shapes,
+                                  subgraph,
+                                  attributes,
+                                  pos,
+                                  self._df,
+                                  self.config)
 
         logger.info("Network creation finished.")
         logger.info(f"Logfile written to {self.config.log}")
@@ -107,10 +127,15 @@ class Plotting:
             plt.show()
 
         for ext in config.o_formats:
+            _path = f"{config.o}scatter/{config.name}.{ext}"
+            dirname = os.path.dirname(_path)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
             fig = plot.get_figure()
-            fig.savefig(f"{config.o}map_scatter_{config.name}.{ext}", bbox_inches='tight')
+            fig.savefig(_path, bbox_inches='tight')
 
         plt.clf()
+        plt.close('all')
 
     @staticmethod
     def cities(df, shp, config):
@@ -123,15 +148,21 @@ class Plotting:
         :param config: Configuration object
         :type config: `bibliometa.configuration.Config`
         """
-        plot = df.plot(ax=shp.plot(figsize=config.figsize, marker='o', color=config.shapefile_color, markersize=45))
+        plot = df.plot(ax=shp.plot(figsize=config.figsize, marker='o', color=config.shapefile_color, markersize=45),
+                       aspect=1)
         if config.verbose:
             plt.show()
 
         for ext in config.o_formats:
+            _path = f"{config.o}cities/{config.name}.{ext}"
+            dirname = os.path.dirname(_path)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
             fig = plot.get_figure()
-            fig.savefig(f"{config.o}map_cities_{config.name}.{ext}", bbox_inches='tight')
+            fig.savefig(_path, bbox_inches='tight')
 
         plt.clf()
+        plt.close('all')
 
     @staticmethod
     def degrees(df, shp, nodes, config):
@@ -149,9 +180,9 @@ class Plotting:
         fig, ax = plt.subplots(figsize=config.figsize)
         shp.plot(ax=ax, alpha=0.6, color=config.shapefile_color)
         for city in nodes.keys():
-            if city in df[config.geo_col].tolist():
-                df[df[config.geo_col] == city].plot(ax=ax, markersize=nodes[city],
-                                                    color=config.degree_node_color, marker="o")
+            if city in df[config.keys_labels[1]].tolist():
+                df[df[config.keys_labels[1]] == city].plot(ax=ax, markersize=nodes[city],
+                                                           color=config.degree_node_color, marker="o")
         for x, y, label in zip(df.geometry.x, df.geometry.y, df.city):
             if label in nodes.keys():
                 ax.annotate(label, xy=(x, y), xytext=(3, 3), textcoords="offset points")
@@ -159,12 +190,17 @@ class Plotting:
             plt.show()
 
         for ext in config.o_formats:
-            fig.savefig(f"{config.o}map_degrees_{config.name}.{ext}", bbox_inches='tight')
+            _path = f"{config.o}degrees/{config.name}.{ext}"
+            dirname = os.path.dirname(_path)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            fig.savefig(_path, bbox_inches='tight')
 
         plt.clf()
+        plt.close('all')
 
     @staticmethod
-    def graph_on_map(shapes, subgraph, attributes, pos, config):
+    def graph_on_map(shapes, subgraph, attributes, pos, df, config):
         """Plot graph on a map.
 
         :param shapes: An iterator of shapely geometries from a shapefile
@@ -175,6 +211,8 @@ class Plotting:
         :type attributes:  `dict`
         :param pos: Dictionary of node positions
         :type pos: `dict`
+        :param df: DataFrame with coordinates
+        :type df: `pandas.DataFrame`
         :param config: Configuration object
         :type config: `bibliometa.configuration.Config`
         """
@@ -182,19 +220,22 @@ class Plotting:
         fig, ax = plt.subplots(1, 1, figsize=config.figsize,
                                subplot_kw=dict(projection=crs))
 
-        ax.add_geometries(shapes, crs, edgecolor='black', facecolor='gray', alpha=0.2)
+        ax.add_geometries(shapes, crs, edgecolor='black', facecolor=config.shapefile_color, alpha=0.2)
 
         ax.coastlines()
-        # ax.set_global()
-        ax.set_extent([5.5, 15.5, 47.2, 55.3])
+        if config.map_extent == "global":
+            ax.set_global()
+        else:
+            ax.set_extent(config.map_extent)
 
         nx.draw_networkx(subgraph,
                          ax=ax,
                          # font_size=24,
                          alpha=.5,
-                         width=.25,
+                         width=config.edge_width,
+                         # width=[subgraph[u][v]['weight'] * 0.1 for u, v in subgraph.edges],  # TODO: Implement
                          node_size=attributes["sizes"],
-                         labels=attributes["labels"],
+                         labels=attributes["labels"],  # TODO: Does this have an effect?
                          pos=pos,
                          with_labels=False,
                          # node_color=altitude,
@@ -203,11 +244,14 @@ class Plotting:
 
         # add labels
         for node, (x, y) in pos.items():
-            fs = 12
+            fs = config.fontsize
             try:
-                if attributes["degrees"][node] > 12:
+                if attributes["degrees"][node] > config.fontsize:
                     fs = attributes["degrees"][node]
-                text(x, y, node, fontsize=fs, ha='center', va='center')
+                if config.max_fontsize and fs > config.max_fontsize:
+                    fs = config.max_fontsize
+                label = df[df[config.keys_labels[0]] == node].iloc[0, df.columns.get_loc(config.keys_labels[1])]
+                text(x, y, label, fontsize=fs, ha='center', va='center')
             except Exception:
                 pass
 
@@ -215,9 +259,14 @@ class Plotting:
             plt.show()
 
         for ext in config.o_formats:
-            fig.savefig(f"{config.o}map_network_{config.name}.{ext}", bbox_inches='tight')
+            _path = f"{config.o}network/{config.name}.{ext}"
+            dirname = os.path.dirname(_path)
+            if not os.path.exists(dirname):
+                os.makedirs(dirname)
+            fig.savefig(_path, bbox_inches='tight')
 
         plt.clf()
+        plt.close('all')
 
 
 class MapUtils:
@@ -239,10 +288,10 @@ class MapUtils:
         :rtype: GeoDataFrame
         """
         shp = gpd.read_file(f)
-        if verbose:
-            fig, ax = plt.subplots(figsize=(15, 15))
-            shp.plot(ax=ax, alpha=0.6, color=color)
-            plt.show()
+        # if verbose:
+        # fig, ax = plt.subplots(figsize=(15, 15))
+        # shp.plot(ax=ax, alpha=0.6, color=color)
+        # plt.show()
 
         return shp
 
